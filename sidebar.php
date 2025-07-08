@@ -1,72 +1,66 @@
-<div class="sidebar">
-    <div class="logo">
-        <img src="assets/images/tesda_logo.png" alt="TESDA Logo">
-        <span>TESDA Inventory</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TESDA Inventory System</title>
+    <link rel="stylesheet" href="css/styles.css?v=<?= time() ?>">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="assets/images/tesda_logo.png" alt="TESDA Logo">
+            <span>TESDA Inventory</span>
+        </div>
+            <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>
+            <nav>
+                <a href="inventory.php" class="<?= $currentPage == 'inventory.php' ? 'active' : '' ?>">📋 Supply List</a>
+                <a href="ris.php" class="<?= $currentPage == 'ris.php' ? 'active' : '' ?>">📑 RIS</a>
+                <a href="rsmi.php" class="<?= $currentPage == 'rsmi.php' ? 'active' : '' ?>">🛡️ RSMI</a>
+                <a href="#" class="<?= $currentPage == '#' ? 'active' : '' ?>">♻️ SC</a>
+                <a href="#" class="<?= $currentPage == '#' ? 'active' : '' ?>">⚙️ RPCI</a>
+            </nav>
     </div>
-    <nav>
-        <a href="inventory.php">📋 Supply List</a>
-        <a href="ris.php">📑 RIS</a>
-        <a href="rsmi.php">🛡️ RSMI</a>
-        <a href="#">♻️ SC</a>
-        <a href="#">⚙️ RPCI</a>
-    </nav>
-</div>
 
-<style>
-body {
-    margin-left: 240px;
-    font-family: Arial, sans-serif;
-}
+    <!-- Mobile Menu Toggle (for responsive design) -->
+    <div class="mobile-menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
 
-.sidebar {
-    width: 240px;
-    background-color: rgb(199, 209, 219);
-    color: black;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    left: 0;
-    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
-}
+    <script>
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                    this.classList.toggle('active');
+                });
+            }
 
-.sidebar .logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    !mobileToggle.contains(e.target) &&
+                    sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    mobileToggle.classList.remove('active');
+                }
+            });
 
-.sidebar .logo img {
-    width: 60px;
-    margin-bottom: 8px;
-}
-
-.sidebar .logo span {
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.sidebar nav {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    padding-top: 20px;
-}
-
-.sidebar nav a {
-    padding: 12px 24px;
-    color: black;
-    text-decoration: none;
-    font-size: 15px;
-    transition: background 0.2s, padding-left 0.2s;
-}
-
-.sidebar nav a:hover {
-    background-color: #014080;
-    color: white;
-    padding-left: 28px;
-}
-</style>
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('active');
+                    mobileToggle.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,64 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIS - TESDA Inventory System</title>
+    <link rel="stylesheet" href="css/styles.css?v=<?= time() ?>">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="ris-page">
+
+
 <?php include 'sidebar.php'; ?>
 
 <div class="content">
-    <h2>Requisition and Issue Slip (RIS)</h2>
+    <h2><i class="fas fa-file-alt"></i> Requisition and Issue Slip (RIS)</h2>
 
-    <button onclick="window.location.href='add_ris.php'">➕ Add RIS Form</button>
+    <button onclick="window.location.href='add_ris.php'">
+        <i class="fas fa-plus"></i> Add RIS Form
+    </button>
 
     <table>
         <thead>
             <tr>
-                <th>RIS No.</th>
-                <th>Date</th>
-                <th>Requested By</th>
-                <th>Purpose</th>
-                <th>Actions</th>
+                <th><i class="fas fa-hashtag"></i> RIS No.</th>
+                <th><i class="fas fa-calendar"></i> Date</th>
+                <th><i class="fas fa-user"></i> Requested By</th>
+                <th><i class="fas fa-clipboard-list"></i> Purpose</th>
+                <th><i class="fas fa-cogs"></i> Actions</th>
             </tr>
         </thead>
         <tbody>
             <?php 
             require 'config.php';
-            $result = $conn->query("SELECT * FROM ris");
+            $result = $conn->query("SELECT * FROM ris ORDER BY date_requested DESC");
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo '<tr>';
-                    echo '<td>' . htmlspecialchars($row['ris_no']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['date_requested']) . '</td>';
+                    echo '<td><strong>' . htmlspecialchars($row['ris_no']) . '</strong></td>';
+                    echo '<td>' . date('M d, Y', strtotime($row['date_requested'])) . '</td>';
                     echo '<td>' . htmlspecialchars($row['requested_by']) . '</td>';
                     echo '<td>' . htmlspecialchars($row['purpose']) . '</td>';
                     echo '<td>
-                        <a href="view_ris.php?ris_id=' . $row["ris_id"] . '">View</a> |
-                        <a href="edit_ris.php?ris_id=' . $row["ris_id"] . '">Edit</a> |
-                        <a href="export_ris.php?ris_id=' . $row["ris_id"] . '">Export</a> |
-                        <a href="delete_ris.php?ris_id=' . $row["ris_id"] . '" onclick="return confirm(\'Are you sure you want to delete this RIS?\')">Delete</a>
+                        <a href="view_ris.php?ris_id=' . $row["ris_id"] . '" title="View RIS">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        <a href="edit_ris.php?ris_id=' . $row["ris_id"] . '" title="Edit RIS">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="export_ris.php?ris_id=' . $row["ris_id"] . '" title="Export RIS">
+                            <i class="fas fa-download"></i> Export
+                        </a>
+                        <a href="delete_ris.php?ris_id=' . $row["ris_id"] . '" 
+                           onclick="return confirm(\'Are you sure you want to delete this RIS?\')"
+                           title="Delete RIS">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
                     </td>';
                     echo '</tr>';
                 }
             } else {
-                echo '<tr><td colspan="5">No RIS records found.</td></tr>';
+                echo '<tr><td colspan="5">
+                        <i class="fas fa-inbox"></i> No RIS records found.
+                      </td></tr>';
             }
             ?>
         </tbody>
     </table>
 </div>
 
-<style>
-.content {
-    margin-left: 250px;
-    padding: 20px;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-th, td {
-    padding: 10px;
-    border: 1px solid #ddd;
-}
-button {
-    padding: 8px 16px;
-    margin-bottom: 15px;
-    cursor: pointer;
-}
-</style>
+</body>
+</html>
