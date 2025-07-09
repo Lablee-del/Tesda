@@ -1,3 +1,7 @@
+<?php 
+require 'config.php';
+$currentPage = basename($_SERVER['PHP_SELF']);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,14 +13,13 @@
 <body>
     <div class="sidebar">
         <div class="logo">
-            <img src="assets/images/tesda_logo.png" alt="TESDA Logo">
-            <span>TESDA Inventory</span>
+            <img src="images/tesda_logo.png">
+           <h3>Tesda Inventory</h3>
         </div>
             <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>
             <nav>
                 <a href="inventory.php" class="<?= $currentPage == 'inventory.php' ? 'active' : '' ?>">📋 Supply List</a>
-                <a href="ris.php" class="<?= $currentPage == 'ris.php' ? 'active' : '' ?>">📑 RIS</a>
-                <a href="rsmi.php" class="<?= $currentPage == 'rsmi.php' ? 'active' : '' ?>">🛡️ RSMI</a>
+                <a href="ris.php" class="<?= in_array($currentPage, ['ris.php', 'add_ris.php', 'view_ris.php']) ? 'active' : '' ?>">📑 RIS</a>                <a href="rsmi.php" class="<?= $currentPage == 'rsmi.php' ? 'active' : '' ?>">🛡️ RSMI</a>
                 <a href="#" class="<?= $currentPage == '#' ? 'active' : '' ?>">♻️ SC</a>
                 <a href="#" class="<?= $currentPage == '#' ? 'active' : '' ?>">⚙️ RPCI</a>
             </nav>
@@ -29,38 +32,6 @@
         <span></span>
     </div>
 
-    <script>
-        // Mobile menu toggle functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileToggle = document.querySelector('.mobile-menu-toggle');
-            const sidebar = document.querySelector('.sidebar');
-            
-            if (mobileToggle) {
-                mobileToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('active');
-                    this.classList.toggle('active');
-                });
-            }
-
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', function(e) {
-                if (window.innerWidth <= 768 && 
-                    !sidebar.contains(e.target) && 
-                    !mobileToggle.contains(e.target) &&
-                    sidebar.classList.contains('active')) {
-                    sidebar.classList.remove('active');
-                    mobileToggle.classList.remove('active');
-                }
-            });
-
-            // Handle window resize
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 768) {
-                    sidebar.classList.remove('active');
-                    mobileToggle.classList.remove('active');
-                }
-            });
-        });
-    </script>
+    <script src="js/sidebar_script.js?v=<?= time() ?>"></script>
 </body>
 </html>

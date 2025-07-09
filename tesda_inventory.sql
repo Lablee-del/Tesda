@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 08, 2025 at 06:53 AM
+-- Generation Time: Jul 09, 2025 at 01:52 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -158,10 +158,7 @@ CREATE TABLE `ris` (
 --
 
 INSERT INTO `ris` (`ris_id`, `entity_name`, `fund_cluster`, `division`, `office`, `responsibility_center_code`, `ris_no`, `date_requested`, `purpose`, `requested_by`, `approved_by`, `issued_by`, `received_by`, `created_at`) VALUES
-(1, 'aaa', 'aaa', 'aaaaa', 'aaa', 'aaa', 'aaa', '2000-10-20', 'aaa', '', '', '', '', '2025-07-07 20:31:31'),
-(2, 'ahaa', 'sss', 'sss', 'sss', 'sss', 'sss', '2000-09-10', 'ja', '', '', '', '', '2025-07-07 20:37:26'),
-(4, 'SAMPLE 1', 'TESDA', 'DIV 1', 'OFF', '', 'AUTO GENERATED', '2000-10-20', '', NULL, NULL, NULL, NULL, '2025-07-07 22:18:46'),
-(5, 'qwe', '', '', '', '', '', '2222-02-02', '', NULL, NULL, NULL, NULL, '2025-07-08 01:23:10');
+(14, '123', 'qweq', 'qwe', 'qwe', 'qe', '2025/07/0001', '2025-07-09', '', '123', 'qwe', 'qwe', 'qe', '2025-07-09 11:47:50');
 
 -- --------------------------------------------------------
 
@@ -281,19 +278,19 @@ ALTER TABLE `stock_card`
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=94;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=115;
 
 --
 -- AUTO_INCREMENT for table `ris`
 --
 ALTER TABLE `ris`
-  MODIFY `ris_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ris_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `ris_items`
 --
 ALTER TABLE `ris_items`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=648;
 
 --
 -- AUTO_INCREMENT for table `rpci`

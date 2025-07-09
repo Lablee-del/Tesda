@@ -1,40 +1,105 @@
 <?php
 require 'config.php';
 
-// Handle Delete
-if (isset($_GET['delete'])) {
-    $id = intval($_GET['delete']);
-    $stmt = $conn->prepare("DELETE FROM items WHERE item_id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $stmt->close();
-    header("Location: inventory.php");
-    exit();
-}
-
-// Handle Update
-if (isset($_POST['update_item'])) {
-    $id = intval($_POST['item_id']);
-    $stock_number = $_POST['stock_number'];
-    $description = $_POST['description'];
-    $unit = $_POST['unit'];
-    $reorder_point = intval($_POST['reorder_point']);
-    $unit_cost = floatval($_POST['unit_cost']);
-    $quantity_on_hand = intval($_POST['quantity_on_hand']);
-
-    $stmt = $conn->prepare("UPDATE items SET 
-                stock_number = ?,
-                description = ?,
-                unit = ?,
-                reorder_point = ?,
-                unit_cost = ?,
-                quantity_on_hand = ?
-            WHERE item_id = ?");
+// Handle AJAX requests
+if (isset($_GET['action'])) {
+    header('Content-Type: application/json');
     
-    $stmt->bind_param("sssiidi", $stock_number, $description, $unit, $reorder_point, $unit_cost, $quantity_on_hand, $id);
-    $stmt->execute();
-    $stmt->close();
-    header("Location: inventory.php");
+    switch ($_GET['action']) {
+        case 'delete':
+            if (isset($_POST['id'])) {
+                $id = intval($_POST['id']);
+                $stmt = $conn->prepare("DELETE FROM items WHERE item_id = ?");
+                $stmt->bind_param("i", $id);
+                
+                if ($stmt->execute()) {
+                    echo json_encode(['success' => true, 'message' => 'Item deleted successfully']);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Error deleting item']);
+                }
+                $stmt->close();
+            }
+            break;
+            
+        case 'add':
+            if (isset($_POST['stock_number'])) {
+                $stock_number = $_POST['stock_number'];
+                $description = $_POST['description'];
+                $unit = $_POST['unit'];
+                $reorder_point = intval($_POST['reorder_point']);
+                $unit_cost = floatval($_POST['unit_cost']);
+                $quantity_on_hand = intval($_POST['quantity_on_hand']);
+                
+                $stmt = $conn->prepare("INSERT INTO items (stock_number, description, unit, reorder_point, unit_cost, quantity_on_hand) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("sssiid", $stock_number, $description, $unit, $reorder_point, $unit_cost, $quantity_on_hand);
+                
+                if ($stmt->execute()) {
+                    $new_id = $conn->insert_id;
+                    echo json_encode([
+                        'success' => true, 
+                        'message' => 'Item added successfully',
+                        'item' => [
+                            'item_id' => $new_id,
+                            'stock_number' => $stock_number,
+                            'description' => $description,
+                            'unit' => $unit,
+                            'reorder_point' => $reorder_point,
+                            'unit_cost' => $unit_cost,
+                            'quantity_on_hand' => $quantity_on_hand,
+                            'created_at' => date('Y-m-d H:i:s')
+                        ]
+                    ]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Error adding item']);
+                }
+                $stmt->close();
+            }
+            break;
+            
+        case 'update':
+            if (isset($_POST['item_id'])) {
+                $id = intval($_POST['item_id']);
+                $stock_number = $_POST['stock_number'];
+                $description = $_POST['description'];
+                $unit = $_POST['unit'];
+                $reorder_point = intval($_POST['reorder_point']);
+                $unit_cost = floatval($_POST['unit_cost']);
+                $quantity_on_hand = intval($_POST['quantity_on_hand']);
+                
+                $stmt = $conn->prepare("UPDATE items SET 
+                            stock_number = ?,
+                            description = ?,
+                            unit = ?,
+                            reorder_point = ?,
+                            unit_cost = ?,
+                            quantity_on_hand = ?
+                        WHERE item_id = ?");
+                
+                $stmt->bind_param("sssiidi", $stock_number, $description, $unit, $reorder_point, $unit_cost, $quantity_on_hand, $id);
+                
+                if ($stmt->execute()) {
+                    echo json_encode([
+                        'success' => true, 
+                        'message' => 'Item updated successfully',
+                        'item' => [
+                            'item_id' => $id,
+                            'stock_number' => $stock_number,
+                            'description' => $description,
+                            'unit' => $unit,
+                            'reorder_point' => $reorder_point,
+                            'unit_cost' => $unit_cost,
+                            'quantity_on_hand' => $quantity_on_hand
+                        ]
+                    ]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Error updating item']);
+                }
+                $stmt->close();
+            }
+            break;
+    }
+    
+    $conn->close();
     exit();
 }
 ?>
@@ -59,7 +124,7 @@ if (isset($_POST['update_item'])) {
     </button>
 
     <div class="table-container">
-        <table>
+        <table id="inventoryTable">
             <thead>
                 <tr>
                     <th><i class=""></i> Stock Number</th>
@@ -83,7 +148,7 @@ if (isset($_POST['update_item'])) {
                         $total_cost = $row["quantity_on_hand"] * $row["unit_cost"];
                         $status_class = $row["quantity_on_hand"] <= $row["reorder_point"] ? 'status-low' : 'status-normal';
                         
-                        echo "<tr>
+                        echo "<tr data-id='{$row['item_id']}'>
                             <td><strong>{$row['stock_number']}</strong></td>
                             <td>{$row['description']}</td>
                             <td>{$row['unit']}</td>
@@ -112,12 +177,13 @@ if (isset($_POST['update_item'])) {
                                     <i class='fas fa-edit'></i> Edit
                                 </button>
 
-                                <a href='inventory.php?delete={$row['item_id']}' 
-                                   class='btn delete-btn' 
-                                   onclick='return confirm(\"Are you sure you want to delete this item?\")' 
-                                   title='Delete Item'>
+                                <button 
+                                    class='btn delete-btn' 
+                                    onclick='deleteItem({$row['item_id']})' 
+                                    title='Delete Item'
+                                >
                                     <i class='fas fa-trash'></i> Delete
-                                </a>
+                                </button>
                             </td>
                         </tr>";
                     }
@@ -139,7 +205,7 @@ if (isset($_POST['update_item'])) {
     <div class="modal-content">
         <span class="close" onclick="document.getElementById('addModal').style.display='none'">&times;</span>
         <h3><i class="fas fa-plus-circle"></i> Add New Item</h3>
-        <form method="post" action="add_item.php">
+        <form id="addForm">
             <input type="text" name="stock_number" placeholder="Stock Number" required>
             <input type="text" name="description" placeholder="Description" required>
             <input type="text" name="unit" placeholder="Unit (pcs, box, etc.)" required>
@@ -158,7 +224,7 @@ if (isset($_POST['update_item'])) {
     <div class="modal-content">
         <span class="close" onclick="document.getElementById('editModal').style.display='none'">&times;</span>
         <h3><i class="fas fa-edit"></i> Edit Item</h3>
-        <form method="post">
+        <form id="editForm">
             <input type="hidden" name="item_id" id="edit_item_id">
             <input type="text" name="stock_number" id="edit_stock_number" placeholder="Stock Number" required>
             <input type="text" name="description" id="edit_description" placeholder="Description" required>
@@ -166,60 +232,17 @@ if (isset($_POST['update_item'])) {
             <input type="number" name="reorder_point" id="edit_reorder_point" placeholder="Reorder Point" required min="0">
             <input type="number" step="0.01" name="unit_cost" id="edit_unit_cost" placeholder="Unit Cost (₱)" required min="0">
             <input type="number" name="quantity_on_hand" id="edit_quantity_on_hand" placeholder="Quantity on Hand" required min="0">
-            <button type="submit" name="update_item" class="save-btn">
+            <button type="submit" class="save-btn">
                 <i class="fas fa-save"></i> Update Item
             </button>
         </form>
     </div>
 </div>
 
-<script>
-function openEditModal(button) {
-    const modal = document.getElementById('editModal');
-    
-    // Populate form fields
-    document.getElementById('edit_item_id').value = button.getAttribute('data-id');
-    document.getElementById('edit_stock_number').value = button.getAttribute('data-stock_number');
-    document.getElementById('edit_description').value = button.getAttribute('data-description');
-    document.getElementById('edit_unit').value = button.getAttribute('data-unit');
-    document.getElementById('edit_reorder_point').value = button.getAttribute('data-reorder_point');
-    document.getElementById('edit_unit_cost').value = button.getAttribute('data-unit_cost');
-    document.getElementById('edit_quantity_on_hand').value = button.getAttribute('data-quantity_on_hand');
+<!-- Notification -->
+<div id="notification" class="notification"></div>
 
-    modal.style.display = 'block';
-}
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const addModal = document.getElementById('addModal');
-    const editModal = document.getElementById('editModal');
-    
-    if (event.target === addModal) { 
-        addModal.style.display = "none"; 
-    }
-    if (event.target === editModal) { 
-        editModal.style.display = "none"; 
-    }
-}
-
-// Close modal with Escape key
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        document.getElementById('addModal').style.display = 'none';
-        document.getElementById('editModal').style.display = 'none';
-    }
-});
-
-// Add loading state to buttons
-document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', function() {
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<div class="loading"></div>' + originalText;
-        submitBtn.disabled = true;
-    });
-});
-</script>
+<script src="js/inventory_script.js?v=<?= time() ?>"></script>
 
 </body>
 </html>

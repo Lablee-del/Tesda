@@ -1,3 +1,22 @@
+<?php
+require 'config.php';
+
+// DELETE LOGIC (moved from delete_ris.php)
+if (isset($_GET['delete_ris_id'])) {
+    $ris_id = (int)$_GET['delete_ris_id'];
+
+    // Delete RIS items first due to foreign key constraint
+    $conn->query("DELETE FROM ris_items WHERE ris_id = $ris_id");
+
+    // Then delete RIS header
+    $conn->query("DELETE FROM ris WHERE ris_id = $ris_id");
+
+    // Redirect to avoid resubmission on refresh
+    header("Location: ris.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +27,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="ris-page">
-
 
 <?php include 'sidebar.php'; ?>
 
@@ -31,7 +49,6 @@
         </thead>
         <tbody>
             <?php 
-            require 'config.php';
             $result = $conn->query("SELECT * FROM ris ORDER BY date_requested DESC");
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -44,13 +61,13 @@
                         <a href="view_ris.php?ris_id=' . $row["ris_id"] . '" title="View RIS">
                             <i class="fas fa-eye"></i> View
                         </a>
-                        <a href="edit_ris.php?ris_id=' . $row["ris_id"] . '" title="Edit RIS">
+                        <a href="add_ris.php?ris_id=' . $row["ris_id"] . '" title="Edit RIS">
                             <i class="fas fa-edit"></i> Edit
                         </a>
                         <a href="export_ris.php?ris_id=' . $row["ris_id"] . '" title="Export RIS">
                             <i class="fas fa-download"></i> Export
                         </a>
-                        <a href="delete_ris.php?ris_id=' . $row["ris_id"] . '" 
+                        <a href="ris.php?delete_ris_id=' . $row["ris_id"] . '" 
                            onclick="return confirm(\'Are you sure you want to delete this RIS?\')"
                            title="Delete RIS">
                             <i class="fas fa-trash"></i> Delete

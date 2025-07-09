@@ -30,17 +30,31 @@
 
     $ris = $ris_result->fetch_assoc();
 
-    // Fetch RIS items
-    $item_result = $conn->query("SELECT * FROM ris_items WHERE ris_id = $ris_id");
+    // Fetch ALL items with their RIS data (LEFT JOIN to include all items)
+    $item_query = "
+        SELECT 
+            i.stock_number,
+            i.description,
+            i.unit,
+            i.quantity_on_hand,
+            COALESCE(ri.stock_available, 'No') as stock_available,
+            COALESCE(ri.issued_quantity, 0) as issued_quantity,
+            COALESCE(ri.remarks, '') as remarks
+        FROM items i
+        LEFT JOIN ris_items ri ON i.stock_number = ri.stock_number AND ri.ris_id = $ris_id
+        ORDER BY i.stock_number
+    ";
+    
+    $item_result = $conn->query($item_query);
     ?>
 
     <div class="content">
-        <h2>📋 View RIS<?php echo htmlspecialchars($ris['ris_no']); ?></h2>
+        <h2>📋 Viewing RIS No. <?php echo htmlspecialchars($ris['ris_no']); ?></h2>
 
         <!-- Action Buttons -->
         <div class="ris-actions">
             <a href="ris.php" class="btn btn-secondary">← Back to RIS List</a>
-            <a href="edit_ris.php?ris_id=<?php echo $ris_id; ?>" class="btn btn-primary">✏️ Edit RIS</a>
+            <a href="add_ris.php?ris_id=<?php echo $ris_id; ?>" class="btn btn-primary">✏️ Edit RIS</a>
             <a href="export_ris.php?ris_id=<?php echo $ris_id; ?>" class="btn btn-primary">📄 Export PDF</a>
         </div>
 
@@ -51,37 +65,49 @@
             <p><strong>Division:</strong> <?php echo htmlspecialchars($ris['division']); ?></p>
             <p><strong>Office:</strong> <?php echo htmlspecialchars($ris['office']); ?></p>
             <p><strong>Responsibility Center Code:</strong> <?php echo htmlspecialchars($ris['responsibility_center_code']); ?></p>
+            <p><strong>RIS No:</strong> <?php echo htmlspecialchars($ris['ris_no']); ?></p>
             <p><strong>Date:</strong> <?php echo htmlspecialchars($ris['date_requested']); ?></p>
             <p><strong>Purpose:</strong> <?php echo htmlspecialchars($ris['purpose']); ?></p>
         </div>
 
         <h3>📦 Items</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Stock No.</th>
-                    <th>Stock Available</th>
-                    <th>Issued Quantity</th>
-                    <th>Remarks</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($item_result && $item_result->num_rows > 0) {
-                    while ($item = $item_result->fetch_assoc()) {
-                        echo '<tr>';
-                        echo '<td>' . htmlspecialchars($item['stock_number']) . '</td>';
-                        echo '<td>' . htmlspecialchars($item['stock_available']) . '</td>';
-                        echo '<td>' . htmlspecialchars($item['issued_quantity']) . '</td>';
-                        echo '<td>' . htmlspecialchars($item['remarks']) . '</td>';
-                        echo '</tr>';
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stock No.</th>
+                        <th>Description</th>
+                        <th>Unit</th>
+                        <th>Quantity on Hand</th>
+                        <th>Stock Available</th>
+                        <th>Issued Quantity</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if ($item_result && $item_result->num_rows > 0) {
+                        while ($item = $item_result->fetch_assoc()) {
+                            // Highlight rows where items were actually issued
+                            $row_class = ($item['issued_quantity'] > 0) ? 'style="background-color: #f0f8ff;"' : '';
+                            
+                            echo '<tr ' . $row_class . '>';
+                            echo '<td>' . htmlspecialchars($item['stock_number']) . '</td>';
+                            echo '<td>' . htmlspecialchars($item['description']) . '</td>';
+                            echo '<td>' . htmlspecialchars($item['unit']) . '</td>';
+                            echo '<td>' . htmlspecialchars($item['quantity_on_hand']) . '</td>';
+                            echo '<td>' . htmlspecialchars($item['stock_available']) . '</td>';
+                            echo '<td>' . ($item['issued_quantity'] > 0 ? htmlspecialchars($item['issued_quantity']) : '-') . '</td>';
+                            echo '<td>' . (!empty($item['remarks']) ? htmlspecialchars($item['remarks']) : '-') . '</td>';
+                            echo '</tr>';
+                        }
+                    } else {
+                        echo '<tr><td colspan="7">No items found in inventory.</td></tr>';
                     }
-                } else {
-                    echo '<tr><td colspan="4">No items found for this RIS.</td></tr>';
-                }
-                ?>
-            </tbody>
-        </table>
+                    ?>
+                </tbody>
+            </table>
+        </div>
 
         <h3>✍️ Signatories</h3>
         <div class="ris-details">
@@ -91,49 +117,6 @@
             <p><strong>Received by:</strong> <?php echo htmlspecialchars($ris['received_by']); ?></p>
         </div>
     </div>
-
-    <script>
-        // Handle mobile menu toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileToggle = document.querySelector('.mobile-menu-toggle');
-            const sidebar = document.querySelector('.sidebar');
-            
-            if (mobileToggle && sidebar) {
-                mobileToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('active');
-                    this.classList.toggle('active');
-                });
-
-                // Close sidebar when clicking outside on mobile
-                document.addEventListener('click', function(e) {
-                    if (window.innerWidth <= 768 && 
-                        !sidebar.contains(e.target) && 
-                        !mobileToggle.contains(e.target) &&
-                        sidebar.classList.contains('active')) {
-                        sidebar.classList.remove('active');
-                        mobileToggle.classList.remove('active');
-                    }
-                });
-
-                // Handle window resize
-                window.addEventListener('resize', function() {
-                    if (window.innerWidth > 768) {
-                        sidebar.classList.remove('active');
-                        mobileToggle.classList.remove('active');
-                    }
-                });
-            }
-        });
-
-        // Add confirmation for delete actions (if you add delete functionality)
-        function confirmDelete(risNo) {
-            return confirm(`Are you sure you want to delete RIS ${risNo}? This action cannot be undone.`);
-        }
-
-        // Print functionality
-        function printRIS() {
-            window.print();
-        }
-    </script>
+<script src="js/view_ris_script.js?v=<?= time() ?>"></script>
 </body>
 </html>

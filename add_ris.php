@@ -1,128 +1,298 @@
 <?php include 'sidebar.php'; ?>
 <?php require 'config.php'; ?>
 
-<div class="content">
-    <h2>Add RIS Form</h2>
+<?php
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
+    // Check if we're editing or creating new
+    $is_editing = isset($_POST['is_editing']) && $_POST['is_editing'] == '1';
+    $ris_id = $is_editing ? (int)$_POST['ris_id'] : null;
 
-    <form method="post" action="submit_ris.php" class="ris-form">
-        <h3>RIS Details</h3>
-        <div class="form-group">
+    // RIS Header fields
+    $ris_no = $_POST['ris_no'];
+    $entity_name = $_POST['entity_name'];
+    $fund_cluster = $_POST['fund_cluster'];
+    $division = $_POST['division'];
+    $office = $_POST['office'];
+    $responsibility_center_code = $_POST['responsibility_center_code'];
+    $date_requested = $_POST['date_requested'];
+    $purpose = $_POST['purpose'];
+    $requested_by = $_POST['requested_by'];
+    $approved_by = $_POST['approved_by'];
+    $issued_by = $_POST['issued_by'];
+    $received_by = $_POST['received_by'];
+
+    if ($is_editing) {
+        // Update existing RIS
+        $stmt = $conn->prepare("UPDATE ris SET entity_name = ?, fund_cluster = ?, division = ?, office = ?, 
+                               responsibility_center_code = ?, date_requested = ?, purpose = ?, 
+                               requested_by = ?, approved_by = ?, issued_by = ?, received_by = ? 
+                               WHERE ris_id = ?");
+        $stmt->bind_param("sssssssssssi", $entity_name, $fund_cluster, $division, $office, 
+                         $responsibility_center_code, $date_requested, $purpose, 
+                         $requested_by, $approved_by, $issued_by, $received_by, $ris_id);
+        $stmt->execute();
+        $stmt->close();
+        
+        // Get old items to restore inventory quantities
+        $old_items = [];
+        $stmt = $conn->prepare("SELECT stock_number, issued_quantity FROM ris_items WHERE ris_id = ?");
+        $stmt->bind_param("i", $ris_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $old_items[$row['stock_number']] = $row['issued_quantity'];
+        }
+        $stmt->close();
+        
+        // Delete old items
+        $stmt = $conn->prepare("DELETE FROM ris_items WHERE ris_id = ?");
+        $stmt->bind_param("i", $ris_id);
+        $stmt->execute();
+        $stmt->close();
+        
+        // Restore inventory quantities from old items
+        foreach ($old_items as $stock_no => $old_qty) {
+            $stmt = $conn->prepare("UPDATE items SET quantity_on_hand = quantity_on_hand + ? WHERE stock_number = ?");
+            $stmt->bind_param("is", $old_qty, $stock_no);
+            $stmt->execute();
+            $stmt->close();
+        }
+        
+    } else {
+        // Insert new RIS
+        $stmt = $conn->prepare("INSERT INTO ris (ris_no, entity_name, fund_cluster, division, office, 
+                               responsibility_center_code, date_requested, purpose, requested_by, 
+                               approved_by, issued_by, received_by)
+                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssssssssss", $ris_no, $entity_name, $fund_cluster, $division, $office, 
+                         $responsibility_center_code, $date_requested, $purpose, 
+                         $requested_by, $approved_by, $issued_by, $received_by);
+        $stmt->execute();
+        $ris_id = $stmt->insert_id;
+        $stmt->close();
+    }
+
+    // RIS Items arrays from form
+    $stock_numbers = $_POST['stock_number'];
+    $stock_availables = $_POST['stock_available'];
+    $issued_quantities = $_POST['issued_quantity'];
+    $remarks = $_POST['remarks'];
+
+    // Insert new items and update inventory
+    for ($i = 0; $i < count($stock_numbers); $i++) {
+        $stock_no = $stock_numbers[$i];
+        $stock_available = $stock_availables[$i];
+        $issued_qty = (int)$issued_quantities[$i];
+        $remark = $remarks[$i];
+
+        // Only insert if there's an issued quantity or remarks
+        if ($issued_qty > 0 || !empty($remark)) {
+            $stmt = $conn->prepare("INSERT INTO ris_items (ris_id, stock_number, stock_available, issued_quantity, remarks)
+                                   VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("issis", $ris_id, $stock_no, $stock_available, $issued_qty, $remark);
+            $stmt->execute();
+            $stmt->close();
+
+            // Update inventory: deduct issued quantity
+            if ($issued_qty > 0) {
+                $stmt = $conn->prepare("UPDATE items SET quantity_on_hand = quantity_on_hand - ? WHERE stock_number = ?");
+                $stmt->bind_param("is", $issued_qty, $stock_no);
+                $stmt->execute();
+                $stmt->close();
+            }
+        }
+    }
+
+    // Redirect after successful submission
+    if ($is_editing) {
+        header("Location: view_ris.php?ris_id=" . $ris_id);
+    } else {
+        header("Location: ris.php");
+    }
+    exit();
+}
+
+// Check if we're editing an existing RIS
+$is_editing = isset($_GET['ris_id']) && !empty($_GET['ris_id']);
+$ris_id = $is_editing ? (int)$_GET['ris_id'] : null;
+
+// Initialize variables
+$ris_data = [];
+$ris_items = [];
+
+if ($is_editing) {
+    // Fetch existing RIS data
+    $stmt = $conn->prepare("SELECT * FROM ris WHERE ris_id = ?");
+    $stmt->bind_param("i", $ris_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $ris_data = $result->fetch_assoc();
+        
+        // Fetch RIS items
+        $stmt = $conn->prepare("SELECT * FROM ris_items WHERE ris_id = ?");
+        $stmt->bind_param("i", $ris_id);
+        $stmt->execute();
+        $items_result = $stmt->get_result();
+        
+        while ($item = $items_result->fetch_assoc()) {
+            $ris_items[$item['stock_number']] = $item;
+        }
+    } else {
+        // RIS not found, redirect back
+        header("Location: ris.php");
+        exit();
+    }
+}
+
+// Function to generate the next RIS number (only for new RIS)
+function generateRISNumber($conn) {
+    $current_year = date('Y');
+    $current_month = date('m');
+    $prefix = $current_year . '/' . $current_month . '/';
+    
+    // Get the highest RIS number for current month/year
+    $query = "SELECT ris_no FROM ris WHERE ris_no LIKE ? ORDER BY ris_no DESC LIMIT 1";
+    $stmt = $conn->prepare($query);
+    $search_pattern = $prefix . '%';
+    $stmt->bind_param('s', $search_pattern);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $last_ris = $row['ris_no'];
+        
+        // Extract the incremental part (last 4 digits)
+        $last_increment = (int)substr($last_ris, -4);
+        $next_increment = $last_increment + 1;
+    } else {
+        // First RIS for this month/year
+        $next_increment = 1;
+    }
+    
+    // Format the increment with leading zeros (4 digits)
+    $formatted_increment = str_pad($next_increment, 4, '0', STR_PAD_LEFT);
+    
+    return $prefix . $formatted_increment;
+}
+
+// Generate the RIS number only for new RIS
+$auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $is_editing ? 'Edit RIS Form' : 'Add RIS Form'; ?></title>
+    <link rel="stylesheet" href="path/to/your/combined.css">
+</head>
+<body>
+    <div class="edit-ris-page content">
+        <h2><?php echo $is_editing ? 'Edit RIS Form' : 'Add RIS Form'; ?></h2>
+
+        <form method="post" action="">
+            <?php if ($is_editing): ?>
+                <input type="hidden" name="ris_id" value="<?php echo $ris_id; ?>">
+                <input type="hidden" name="is_editing" value="1">
+            <?php endif; ?>
+            
+            <h3>RIS Details</h3>
+
             <label>Entity Name:</label>
-            <input type="text" name="entity_name" required>
+            <input type="text" name="entity_name" value="<?php echo htmlspecialchars($ris_data['entity_name'] ?? ''); ?>" required>
 
             <label>Fund Cluster:</label>
-            <input type="text" name="fund_cluster">
+            <input type="text" name="fund_cluster" value="<?php echo htmlspecialchars($ris_data['fund_cluster'] ?? ''); ?>">
 
             <label>Division:</label>
-            <input type="text" name="division">
+            <input type="text" name="division" value="<?php echo htmlspecialchars($ris_data['division'] ?? ''); ?>">
 
             <label>Office:</label>
-            <input type="text" name="office">
+            <input type="text" name="office" value="<?php echo htmlspecialchars($ris_data['office'] ?? ''); ?>">
 
             <label>Responsibility Center Code:</label>
-            <input type="text" name="responsibility_center_code">
+            <input type="text" name="responsibility_center_code" value="<?php echo htmlspecialchars($ris_data['responsibility_center_code'] ?? ''); ?>">
 
             <label>RIS No.:</label>
-            <input type="text" name="ris_no">
+            <input type="text" name="ris_no" value="<?php echo htmlspecialchars($auto_ris_number); ?>" readonly style="background-color: #f5f5f5;">
 
             <label>Date:</label>
-            <input type="date" name="date_requested" required>
+            <input type="date" name="date_requested" value="<?php echo $ris_data['date_requested'] ?? ''; ?>" required>
 
-            <label>Purpose:</label>
-            <textarea name="purpose" rows="2"></textarea>
-        </div>
-
-        <h3>RIS Items</h3>
-        <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Stock No.</th>
-                        <th>Description</th>
-                        <th>Unit</th>
-                        <th>Quantity on Hand</th>
-                        <th>Stock Available</th>
-                        <th>Issued Qty</th>
-                        <th>Remarks</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php 
-                    $result = $conn->query("SELECT * FROM items");
-                    if ($result && $result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            echo '<tr>';
-                            echo '<td><input type="hidden" name="stock_number[]" value="' . htmlspecialchars($row['stock_number']) . '">' . htmlspecialchars($row['stock_number']) . '</td>';
-                            echo '<td>' . htmlspecialchars($row['description']) . '</td>';
-                            echo '<td>' . htmlspecialchars($row['unit']) . '</td>';
-                            echo '<td>' . htmlspecialchars($row['quantity_on_hand']) . '</td>';
-                            echo '<td>
-                                    <select name="stock_available[]">
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
-                                    </select>
-                                </td>';
-                            echo '<td><input type="number" name="issued_quantity[]" min="0" max="' . htmlspecialchars($row['quantity_on_hand']) . '"></td>';
-                            echo '<td><input type="text" name="remarks[]"></td>';
-                            echo '</tr>';
+            <h3>RIS Items</h3>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stock No.</th>
+                            <th>Description</th>
+                            <th>Unit</th>
+                            <th>Quantity on Hand</th>
+                            <th>Stock Available</th>
+                            <th>Issued Qty</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $result = $conn->query("SELECT * FROM items");
+                        if ($result && $result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                $stock_number = $row['stock_number'];
+                                $existing_item = $ris_items[$stock_number] ?? null;
+                                
+                                echo '<tr>';
+                                echo '<td><input type="hidden" name="stock_number[]" value="' . htmlspecialchars($stock_number) . '">' . htmlspecialchars($stock_number) . '</td>';
+                                echo '<td>' . htmlspecialchars($row['description']) . '</td>';
+                                echo '<td>' . htmlspecialchars($row['unit']) . '</td>';
+                                echo '<td>' . htmlspecialchars($row['quantity_on_hand']) . '</td>';
+                                echo '<td>
+                                        <select name="stock_available[]">
+                                            <option value="Yes"' . (($existing_item && $existing_item['stock_available'] == 'Yes') ? ' selected' : '') . '>Yes</option>
+                                            <option value="No"' . (($existing_item && $existing_item['stock_available'] == 'No') ? ' selected' : '') . '>No</option>
+                                        </select>
+                                    </td>';
+                                echo '<td><input type="number" name="issued_quantity[]" value="' . ($existing_item ? htmlspecialchars($existing_item['issued_quantity']) : '') . '" min="0" max="' . htmlspecialchars($row['quantity_on_hand']) . '"></td>';
+                                echo '<td><input type="text" name="remarks[]" value="' . ($existing_item ? htmlspecialchars($existing_item['remarks']) : '') . '"></td>';
+                                echo '</tr>';
+                            }
+                        } else {
+                            echo '<tr><td colspan="7">No inventory items found.</td></tr>';
                         }
-                    } else {
-                        echo '<tr><td colspan="7">No inventory items found.</td></tr>';
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </div>
+                        ?>
+                    </tbody>
+                </table>
+            </div>
 
-        <h3>Signatories</h3>
-        <div class="form-group">
+            <h3>Purpose</h3>
+            <label>Purpose:</label>
+            <textarea name="purpose" rows="3" style="width: 100%; resize: vertical;"><?php echo htmlspecialchars($ris_data['purpose'] ?? ''); ?></textarea>
+
+            <h3>Signatories</h3>
+
             <label>Requested by:</label>
-            <input type="text" name="requested_by">
+            <input type="text" name="requested_by" value="<?php echo htmlspecialchars($ris_data['requested_by'] ?? ''); ?>">
 
             <label>Approved by:</label>
-            <input type="text" name="approved_by">
+            <input type="text" name="approved_by" value="<?php echo htmlspecialchars($ris_data['approved_by'] ?? ''); ?>">
 
             <label>Issued by:</label>
-            <input type="text" name="issued_by">
+            <input type="text" name="issued_by" value="<?php echo htmlspecialchars($ris_data['issued_by'] ?? ''); ?>">
 
             <label>Received by:</label>
-            <input type="text" name="received_by">
-        </div>
+            <input type="text" name="received_by" value="<?php echo htmlspecialchars($ris_data['received_by'] ?? ''); ?>">
 
-        <button type="submit">Submit RIS</button>
-    </form>
-</div>
-
-<style>
-.content {
-    margin-left: 250px;
-    padding: 20px;
-}
-.ris-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-.form-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-.ris-form input, .ris-form textarea, .ris-form select {
-    padding: 6px;
-    width: 100%;
-    box-sizing: border-box;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 10px;
-}
-th, td {
-    padding: 6px;
-    border: 1px solid #ccc;
-}
-button {
-    padding: 8px 16px;
-}
-</style>
+            <button type="submit"><?php echo $is_editing ? 'Update RIS' : 'Submit RIS'; ?></button>
+            <a href="<?php echo $is_editing ? 'view_ris.php?ris_id=' . $ris_id : 'ris.php'; ?>" style="margin-left: 10px;">
+                <button type="button">Cancel</button>
+            </a>
+        </form>
+    </div>
+</body>
+</html>
