@@ -38,8 +38,8 @@
 
         <div class="ris-actions">
             <a href="SC.php" class="btn btn-secondary">← Back to SC List</a>
-            <a >✏️ Edit SC</a>
-            <a >📄 Export PDF</a>
+            <a class="btn btn-primary">✏️ Edit SC</a>
+            <a class="btn btn-primary">📄 Export PDF</a>
         </div>
 
         <div class="ris-details">
