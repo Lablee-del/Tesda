@@ -36,15 +36,13 @@
     <div class="content">
         <h2>📋 Viewing Item No. <?php echo htmlspecialchars($items['item_id']); ?></h2>
 
-        <!-- Action Buttons -->
-        <div class="ris-actions">
+        <div class="SC-actions">
             <a href="SC.php" class="btn btn-secondary">← Back to SC List</a>
-            <a href="add_ris.php?ris_id=<?php echo $item_id; ?>" class="btn btn-primary">✏️ Edit SC</a>
-            <a href="export_ris.php?ris_id=<?php echo $item_id; ?>" class="btn btn-primary">📄 Export PDF</a>
+            <a >✏️ Edit SC</a>
+            <a >📄 Export PDF</a>
         </div>
 
-        <!-- RIS Details -->
-        <div class="ris-details">
+        <div class="SC-details">
             <p><strong>Entity Name:</strong> <?php echo "TESDA"; ?></p>
             <p><strong>Item:</strong> <?php echo htmlspecialchars($items['description']); ?></p>
             <p><strong>Description:</strong> <?php echo htmlspecialchars($items['description']); ?></p>
