@@ -36,13 +36,13 @@
     <div class="content">
         <h2>📋 Viewing Item No. <?php echo htmlspecialchars($items['item_id']); ?></h2>
 
-        <div class="SC-actions">
+        <div class="ris-actions">
             <a href="SC.php" class="btn btn-secondary">← Back to SC List</a>
             <a >✏️ Edit SC</a>
             <a >📄 Export PDF</a>
         </div>
 
-        <div class="SC-details">
+        <div class="ris-details">
             <p><strong>Entity Name:</strong> <?php echo "TESDA"; ?></p>
             <p><strong>Item:</strong> <?php echo htmlspecialchars($items['description']); ?></p>
             <p><strong>Description:</strong> <?php echo htmlspecialchars($items['description']); ?></p>
