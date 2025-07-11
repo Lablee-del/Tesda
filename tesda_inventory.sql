@@ -41,9 +41,9 @@ CREATE TABLE `items` (
 -- Dumping data for table `items`
 --
 
-INSERT INTO `items` (`item_id`, `stock_number`, `description`, `unit`, `reorder_point`, `unit_cost`, `quantity_on_hand`) VALUES
-(7, 'A.01.a', 'ARCHFILE FOLDER, Tagila Lock', 'pc', NULL, NULL, 0),
-(8, 'A.02.a', 'AIR FRESHINER REFILL, Automatic Spray Refill(glade), 269ml/175g', 'can', NULL, NULL, 0),
+INSERT INTO `items` (`item_id`, `stock_number`, `description`,`unit_measurement`, `unit`, `reorder_point`, `unit_cost`, `quantity_on_hand`) VALUES
+(7, 'A.01.a', 'ARCHFILE FOLDER, Tagila Lock',NULL, 'pc', NULL, NULL, 0),
+(8, 'A.02.a', 'AIR FRESHINER REFILL, Automatic Spray Refill(glade)', '269ml/175g', 'can', NULL, NULL, 0),
 (9, 'A.03.a', 'ALCOHOL, 70% ethy/isopropyl, with moisturizer, gallon', 'gallon', NULL, NULL, 0),
 (10, 'A.03.b', 'ALCOHOL, 70% ethyl/isopropyl, 500ml', 'bottle', NULL, NULL, 0),
 (11, 'B.01.a', 'BATTERY, dry cell, AA, 4pcs/pack, 1.5V, heavy duty', 'pack', NULL, NULL, 0),
