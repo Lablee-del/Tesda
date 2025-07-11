@@ -210,12 +210,24 @@ if (isset($_GET['action'])) {
         <span class="close" onclick="document.getElementById('addModal').style.display='none'">&times;</span>
         <h3><i class="fas fa-plus-circle"></i> Add New Item</h3>
         <form id="addForm">
+            <label for="stock_number">Stock Number</label>
             <input type="text" name="stock_number" placeholder="Stock Number" required>
+
+            <label for="stock_number">Stock Number</label>
             <input type="text" name="description" placeholder="Description" required>
+
+            <label for="stock_number">Stock Number</label>
             <input type="text" name="unit" placeholder="Unit (pcs, box, etc.)" required>
+
+            <label for="stock_number">Stock Number</label>
             <input type="number" name="reorder_point" placeholder="Reorder Point" required min="0">
+
+            <label for="stock_number">Stock Number</label>
             <input type="number" step="0.01" name="unit_cost" placeholder="Unit Cost (₱)" required min="0">
+
+            <label for="stock_number">Stock Number</label>
             <input type="number" name="quantity_on_hand" placeholder="Quantity on Hand" required min="0">
+            
             <button type="submit" class="save-btn">
                 <i class="fas fa-save"></i> Save Item
             </button>
@@ -230,12 +242,25 @@ if (isset($_GET['action'])) {
         <h3><i class="fas fa-edit"></i> Edit Item</h3>
         <form id="editForm">
             <input type="hidden" name="item_id" id="edit_item_id">
-            <input type="text" name="stock_number" id="edit_stock_number" placeholder="Stock Number" required>
-            <input type="text" name="description" id="edit_description" placeholder="Description" required>
-            <input type="text" name="unit" id="edit_unit" placeholder="Unit" required>
-            <input type="number" name="reorder_point" id="edit_reorder_point" placeholder="Reorder Point" required min="0">
-            <input type="number" step="0.01" name="unit_cost" id="edit_unit_cost" placeholder="Unit Cost (₱)" required min="0">
-            <input type="number" name="quantity_on_hand" id="edit_quantity_on_hand" placeholder="Quantity on Hand" required min="0">
+            
+            <label for="edit_stock_number">Stock Number</label>
+            <input type="text" name="stock_number" id="edit_stock_number" placeholder="e.g. 1001" required>
+
+            <label for="edit_description">Description</label>
+            <input type="text" name="description" id="edit_description" placeholder="e.g. Hammer" required>
+
+            <label for="edit_unit">Unit</label>
+            <input type="text" name="unit" id="edit_unit" placeholder="pcs, box, etc." required>
+
+            <label for="edit_reorder_point">Reorder Point</label>
+            <input type="number" name="reorder_point" id="edit_reorder_point" placeholder="e.g. 10" required min="0">
+
+            <label for="edit_unit_cost">Unit Cost (₱)</label>
+            <input type="number" step="0.01" name="unit_cost" id="edit_unit_cost" placeholder="e.g. 25.00" required min="0">
+
+            <label for="edit_quantity_on_hand">Quantity on Hand</label>
+            <input type="number" name="quantity_on_hand" id="edit_quantity_on_hand" placeholder="e.g. 100" required min="0">'
+            
             <button type="submit" class="save-btn">
                 <i class="fas fa-save"></i> Update Item
             </button>

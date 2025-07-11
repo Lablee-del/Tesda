@@ -264,18 +264,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const addModal = document.getElementById('addModal');
-    const editModal = document.getElementById('editModal');
-    
-    if (event.target === addModal) { 
-        addModal.style.display = "none"; 
-    }
-    if (event.target === editModal) { 
-        editModal.style.display = "none"; 
-    }
-}
 
 // Close modal with Escape key
 document.addEventListener('keydown', function(event) {
