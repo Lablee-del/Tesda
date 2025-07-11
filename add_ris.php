@@ -211,10 +211,15 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
             <input type="text" name="fund_cluster" value="<?php echo htmlspecialchars($ris_data['fund_cluster'] ?? ''); ?>">
 
             <label>Division:</label>
-            <input type="text" name="division" value="<?php echo htmlspecialchars($ris_data['division'] ?? ''); ?>">
+           <select name="division" required>
+                <option value="">-- Select Division --</option>
+                <option value="ORD" <?php echo (isset($ris_data['division']) && $ris_data['division'] == 'ORD') ? 'selected' : ''; ?>>ORD</option>
+                <option value="ROD" <?php echo (isset($ris_data['division']) && $ris_data['division'] == 'ROD') ? 'selected' : ''; ?>>ROD</option>
+                <option value="FASD" <?php echo (isset($ris_data['division']) && $ris_data['division'] == 'FASD') ? 'selected' : ''; ?>>FASD</option>
+            </select>
 
             <label>Office:</label>
-            <input type="text" name="office" value="<?php echo htmlspecialchars($ris_data['office'] ?? ''); ?>">
+            <input type="text" name="office" value="<?php echo htmlspecialchars($ris_data['office'] ?? 'TESDA CAR'); ?>">
 
             <label>Responsibility Center Code:</label>
             <input type="text" name="responsibility_center_code" value="<?php echo htmlspecialchars($ris_data['responsibility_center_code'] ?? ''); ?>">

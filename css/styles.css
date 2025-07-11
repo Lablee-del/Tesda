@@ -419,7 +419,7 @@ tbody tr:hover {
 /* Search and Filter Styles (for future enhancements) */
 .search-container {
     margin-bottom: 20px;
-    display: flex;
+    display: block;
     gap: 15px;
     align-items: center;
     flex-wrap: wrap;
@@ -427,7 +427,7 @@ tbody tr:hover {
 
 .search-input {
     flex: 1;
-    min-width: 250px;
+    min-width: 800px;
     padding: 12px 20px;
     border: 2px solid #e8f0fe;
     border-radius: 25px;

@@ -119,9 +119,13 @@ if (isset($_GET['action'])) {
 <div class="container">
     <h2><i class=""></i> TESDA Inventory</h2>
 
-    <button class="add-btn" onclick="document.getElementById('addModal').style.display='block'">
-        <i class="fas fa-plus"></i> Add New Item
-    </button>
+    <div class="search-container">
+        <button class="add-btn" onclick="document.getElementById('addModal').style.display='block'">
+            <i class="fas fa-plus"></i> Add New Item
+        </button>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search by stock number, description, or unit...">
+    </div>
+
 
     <div class="table-container">
         <table id="inventoryTable">

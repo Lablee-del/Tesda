@@ -284,3 +284,20 @@ document.addEventListener('keydown', function(event) {
         document.getElementById('editModal').style.display = 'none';
     }
 });
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const rows = document.querySelectorAll('#inventoryTable tbody tr');
+
+    searchInput.addEventListener('input', function () {
+        const keyword = this.value.toLowerCase();
+
+        rows.forEach(row => {
+            const stock = row.children[0].textContent.toLowerCase();
+            const desc = row.children[1].textContent.toLowerCase();
+            const unit = row.children[2].textContent.toLowerCase();
+
+            const match = stock.includes(keyword) || desc.includes(keyword) || unit.includes(keyword);
+            row.style.display = match ? '' : 'none';
+        });
+    });
+});
