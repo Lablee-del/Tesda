@@ -1175,3 +1175,9 @@ tbody tr:hover {
         font-size: 0.7rem;
     }
 }
+
+.scexport {
+    background: linear-gradient(135deg, #ffa726 0%, #ff9800 100%)!important;
+    color: var(--white)!important;
+    box-shadow: 0 2px 8px rgba(255, 167, 38, 0.3)!important;
+}
