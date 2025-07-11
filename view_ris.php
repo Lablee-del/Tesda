@@ -58,7 +58,7 @@
             <a href="export_ris.php?ris_id=<?php echo $ris_id; ?>" class="btn btn-primary">📄 Export PDF</a>
         </div>
 
-        <!-- RIS Details -->
+        <!-- RIS Details (Purpose removed from here) -->
         <div class="ris-details">
             <p><strong>Entity Name:</strong> <?php echo htmlspecialchars($ris['entity_name']); ?></p>
             <p><strong>Fund Cluster:</strong> <?php echo htmlspecialchars($ris['fund_cluster']); ?></p>
@@ -67,7 +67,6 @@
             <p><strong>Responsibility Center Code:</strong> <?php echo htmlspecialchars($ris['responsibility_center_code']); ?></p>
             <p><strong>RIS No:</strong> <?php echo htmlspecialchars($ris['ris_no']); ?></p>
             <p><strong>Date:</strong> <?php echo htmlspecialchars($ris['date_requested']); ?></p>
-            <p><strong>Purpose:</strong> <?php echo htmlspecialchars($ris['purpose']); ?></p>
         </div>
 
         <h3>📦 Items</h3>
@@ -107,6 +106,12 @@
                     ?>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Purpose Section (moved here) -->
+        <h3>📝 Purpose</h3>
+        <div class="ris-details">
+            <p><strong>Purpose:</strong> <?php echo htmlspecialchars($ris['purpose']); ?></p>
         </div>
 
         <h3>✍️ Signatories</h3>

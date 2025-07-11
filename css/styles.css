@@ -610,6 +610,9 @@ tbody tr:hover {
     box-shadow: 2px 0 15px rgba(0, 56, 168, 0.15);
     z-index: 1000;
 }
+.sidebar .logo-text {
+    text-decoration: none;
+}
 
 .sidebar .logo {
     display: flex;
@@ -1015,6 +1018,87 @@ tbody tr:hover {
     box-shadow: 0 6px 20px rgba(0, 56, 168, 0.4);
     background: var(--blue-gradient-hover);
 }
+.ris-page .header-controls {
+    display: inline-block;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.ris-page .sort-container {
+    display: inline-flex;
+    gap: 12px;
+    background: var(--white);
+    padding: 5px 30px;
+    border-radius: 25px;
+    box-shadow: 0 4px 15px var(--shadow-blue);
+    border: 2px solid var(--border-gray);
+    transition: all 0.3s ease;
+}
+
+.ris-page .sort-container:hover {
+    box-shadow: 0 6px 20px var(--shadow-blue-hover);
+    border-color: var(--primary-blue);
+}
+
+.ris-page .sort-container label {
+    font-weight: 600;
+    color: var(--primary-blue);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ris-page .sort-container select {
+    padding: 8px 15px;
+    border: 2px solid var(--border-gray);
+    border-radius: 10px;
+    background: var(--light-gray);
+    font-size: 1rem;
+    cursor: pointer;
+    min-width: 180px;
+    font-weight: 500;
+    color: var(--text-gray);
+    transition: all 0.3s ease;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230038a8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.ris-page .sort-container select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.1);
+    background-color: var(--white);
+}
+
+.ris-page .sort-container select:hover {
+    border-color: var(--secondary-blue);
+    background-color: var(--white);
+}
+
+/* Responsive styles for mobile */
+@media (max-width: 768px) {
+    .ris-page .header-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .ris-page .sort-container {
+        justify-content: center;
+        padding: 10px 15px;
+    }
+
+    .ris-page .sort-container select {
+        min-width: auto;
+        flex: 1;
+    }
+}
+
 
 /* Responsive Design for Edit RIS */
 @media (max-width: 768px) {

@@ -12,15 +12,18 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 </head>
 <body>
     <div class="sidebar">
-        <div class="logo">
-            <img src="images/tesda_logo.png">
-           <h3>Tesda Inventory</h3>
-        </div>
+        <a href="inventory.php" class="logo-text">
+            <div class="logo">
+                <img src="images/tesda_logo.png">
+                <h3>Tesda Inventory</h3>
+            </div>
+        </a>
+
             <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>
             <nav>
                 <a href="inventory.php" class="<?= $currentPage == 'inventory.php' ? 'active' : '' ?>">📋 Supply List</a>
                 <a href="ris.php" class="<?= in_array($currentPage, ['ris.php', 'add_ris.php', 'view_ris.php']) ? 'active' : '' ?>">📑 RIS</a>                <a href="rsmi.php" class="<?= $currentPage == 'rsmi.php' ? 'active' : '' ?>">🛡️ RSMI</a>
-                <a href="SC.php" class="<?= $currentPage == 'SC.php' ? 'active' : '' ?>">♻️ SC</a>
+                <a href="SC.php" class="<?= in_array($currentPage, ['SC.php', "view_sc.php"]) ? 'active' : '' ?>">♻️ SC</a>
                 <a href="#" class="<?= $currentPage == '#' ? 'active' : '' ?>">⚙️ RPCI</a>
             </nav>
     </div>
