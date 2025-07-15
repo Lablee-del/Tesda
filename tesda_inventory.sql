@@ -227,6 +227,20 @@ CREATE TABLE `stock_card` (
   `issued_to_office` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `rpci` (
+  `rpci_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `item_id` INT NOT NULL,
+  `stock_number` VARCHAR(50),
+  `description` VARCHAR(255),
+  `unit` VARCHAR(50),
+  `unit_cost` DECIMAL(10,2),
+  `quantity_per_count` INT NOT NULL,
+  `total_amount` DECIMAL(10,2) GENERATED ALWAYS AS (`quantity_per_count` * `unit_cost`) STORED,
+  `date_recorded` DATE NOT NULL DEFAULT CURRENT_DATE,
+  FOREIGN KEY (`item_id`) REFERENCES `items`(`item_id`) ON DELETE CASCADE
+);
+
 --
 -- Indexes for dumped tables
 --
