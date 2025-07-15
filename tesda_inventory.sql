@@ -228,18 +228,25 @@ CREATE TABLE `stock_card` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 ------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `rpci` (
-  `rpci_id` INT AUTO_INCREMENT PRIMARY KEY,
-  `item_id` INT NOT NULL,
-  `stock_number` VARCHAR(50),
-  `description` VARCHAR(255),
-  `unit` VARCHAR(50),
-  `unit_cost` DECIMAL(10,2),
-  `quantity_per_count` INT NOT NULL,
-  `total_amount` DECIMAL(10,2) GENERATED ALWAYS AS (`quantity_per_count` * `unit_cost`) STORED,
-  `date_recorded` DATE NOT NULL DEFAULT CURRENT_DATE,
-  FOREIGN KEY (`item_id`) REFERENCES `items`(`item_id`) ON DELETE CASCADE
-);
+DROP TABLE IF EXISTS `rpci`;
+
+CREATE TABLE `rpci` (
+  `rpci_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `inventory_type` VARCHAR(100) DEFAULT NULL,
+  `as_of_date` DATE DEFAULT NULL,
+  `fund_cluster` VARCHAR(50) DEFAULT NULL,
+  `article` VARCHAR(100) DEFAULT NULL,
+  `description` VARCHAR(255) DEFAULT NULL,
+  `stock_number` VARCHAR(50) DEFAULT NULL,
+  `unit` VARCHAR(50) DEFAULT NULL,
+  `unit_value` DECIMAL(10,2) DEFAULT NULL,
+  `balance_per_card` INT(11) DEFAULT NULL,
+  `on_hand_per_count` INT(11) DEFAULT NULL,
+  `shortage` INT(11) DEFAULT 0,
+  `overage` INT(11) DEFAULT 0,
+  `remarks` VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY (`rpci_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
