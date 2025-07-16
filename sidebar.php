@@ -24,7 +24,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 <a href="inventory.php" class="<?= $currentPage == 'inventory.php' ? 'active' : '' ?>">📋 Supply List</a>
                 <a href="ris.php" class="<?= in_array($currentPage, ['ris.php', 'add_ris.php', 'view_ris.php']) ? 'active' : '' ?>">📑 RIS</a>                <a href="rsmi.php" class="<?= $currentPage == 'rsmi.php' ? 'active' : '' ?>">🛡️ RSMI</a>
                 <a href="SC.php" class="<?= in_array($currentPage, ['SC.php', "view_sc.php"]) ? 'active' : '' ?>">♻️ SC</a>
-                <a href="#" class="<?= $currentPage == '#' ? 'active' : '' ?>">⚙️ RPCI</a>
+                <a href="rpci.php" class="<?= $currentPage == '"rpci.php"' ? 'active' : '' ?>">⚙️ RPCI</a>
             </nav>
     </div>
 
