@@ -117,7 +117,7 @@ if (isset($_GET['action'])) {
 <?php include 'sidebar.php'; ?>
 
 <div class="container">
-    <h2><i class=""></i> TESDA Inventory</h2>
+    <h2><i class=""></i> Office Supplies</h2>
 
     <div class="search-container">
         <button class="add-btn" onclick="document.getElementById('addModal').style.display='block'">
@@ -213,19 +213,19 @@ if (isset($_GET['action'])) {
             <label for="stock_number">Stock Number</label>
             <input type="text" name="stock_number" placeholder="Stock Number" required>
 
-            <label for="stock_number">Stock Number</label>
+            <label for="stock_number">Descriptionr</label>
             <input type="text" name="description" placeholder="Description" required>
 
-            <label for="stock_number">Stock Number</label>
+            <label for="stock_number">Unit (pcs, box, etc.)</label>
             <input type="text" name="unit" placeholder="Unit (pcs, box, etc.)" required>
 
-            <label for="stock_number">Stock Number</label>
+            <label for="stock_number">Reorder Point</label>
             <input type="number" name="reorder_point" placeholder="Reorder Point" required min="0">
 
-            <label for="stock_number">Stock Number</label>
+            <label for="stock_number">Unit Cost (₱)</label>
             <input type="number" step="0.01" name="unit_cost" placeholder="Unit Cost (₱)" required min="0">
 
-            <label for="stock_number">Stock Number</label>
+            <label for="stock_number">Quantity on Hand</label>
             <input type="number" name="quantity_on_hand" placeholder="Quantity on Hand" required min="0">
             
             <button type="submit" class="save-btn">
