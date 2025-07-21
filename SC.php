@@ -14,7 +14,13 @@
 <div class="content">
     <h2> Stock Card (SC)</h2>
 
-    <table>
+    
+<div class="search-container-sc">
+            <input type="text" id="searchInput" class="search-input-sc" placeholder="Search by stock number, description, or unit...">
+</div>
+
+
+    <table id="scTable">
         <thead>
             <tr>
                 <th><i class=""></i> Stock No.</th>
@@ -25,6 +31,24 @@
             </tr>
         </thead>
         <tbody>
+
+
+        <!-- Search Bar JS-->
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#scTable tbody tr');
+
+        rows.forEach(row => {
+            const stockNo = row.cells[0].textContent.toLowerCase();
+            const description = row.cells[1].textContent.toLowerCase();
+            const unit = row.cells[2].textContent.toLowerCase();
+
+            const match = stockNo.includes(filter) || description.includes(filter) || unit.includes(filter);
+            row.style.display = match ? '' : 'none';
+        });
+    });
+</script>
 
 
             <?php 

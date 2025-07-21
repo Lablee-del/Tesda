@@ -1601,3 +1601,21 @@ tbody tr:hover {
     color: var(--white)!important;
     box-shadow: 0 2px 8px rgba(255, 167, 38, 0.3)!important;
 }
+
+.search-input-sc {
+    width: 800px;
+    padding: 12px 20px;
+    border: 2px solid #e8f0fe;
+    border-radius: 25px;
+    font-size: 1rem;
+    background-color: white;
+    transition: border-color 0.3s ease;
+}
+
+.search-container-sc {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}

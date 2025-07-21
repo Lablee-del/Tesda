@@ -38,18 +38,18 @@
 
         <div class="ris-actions">
             <a href="SC.php" class="btn btn-secondary">← Back to SC List</a>
-            <a class="btn btn-primary">✏️ Edit SC</a>
             <a class="btn btn-primary">📄 Export PDF</a>
         </div>
 
         <div class="ris-details">
             <p><strong>Entity Name:</strong> <?php echo "TESDA"; ?></p>
             <p><strong>Item:</strong> <?php echo htmlspecialchars($items['description']); ?></p>
-            <p><strong>Description:</strong> <?php echo htmlspecialchars($items['description']); ?></p>
+            <p><strong>Quantity:</strong> <?php echo htmlspecialchars($items['quantity_on_hand']); ?></p>
             <p><strong>Stock No.:</strong> <?php echo htmlspecialchars($items['stock_number']); ?></p>
             <p><strong>Unit of Measurement:</strong> <?php echo htmlspecialchars($items['unit']); ?></p>
             <p><strong>Re-order Point:</strong> <?php echo htmlspecialchars($items['reorder_point']); ?></p>
             <p><strong>Date:</strong> <?php echo date('m/d/Y'); ?></p>
+            <p><strong>History:</strong></p>
         </div>
 
     </div>
