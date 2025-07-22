@@ -1,6 +1,21 @@
 <?php
 require 'config.php';
 include 'sidebar.php';
+
+// Fetch inventory items from database
+$inventory_items = [];
+$sql = "SELECT description, stock_number FROM items ORDER BY description";
+$result = $conn->query($sql);
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $inventory_items[] = $row;
+    }
+} else {
+    // Handle database error
+    error_log("Database error: " . $conn->error);
+    $inventory_items = [];
+}
 ?>
 
 <!DOCTYPE html>
@@ -68,26 +83,25 @@ include 'sidebar.php';
                     </thead>
                     <tbody>
                         <?php
-                        // Sample data - replace with database query
-                        $inventory_items = [
-                            // This will be populated from database
-                        ];
-                        
                         if (empty($inventory_items)) {
                             echo '<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-gray); font-style: italic;">No inventory items found</td></tr>';
                         } else {
                             foreach ($inventory_items as $item) {
                                 echo '<tr>';
-                                echo '<td>' . htmlspecialchars($item['article'] ?? '') . '</td>';
+                                // Article column with default value "Office Supplies"
+                                echo '<td>Office Supplies</td>';
+                                // Description from database
                                 echo '<td>' . htmlspecialchars($item['description'] ?? '') . '</td>';
+                                // Stock Number from database
                                 echo '<td>' . htmlspecialchars($item['stock_number'] ?? '') . '</td>';
-                                echo '<td>' . htmlspecialchars($item['unit_of_measure'] ?? '') . '</td>';
-                                echo '<td class="currency">₱' . number_format($item['unit_value'] ?? 0, 2) . '</td>';
-                                echo '<td>' . htmlspecialchars($item['balance_per_card'] ?? '') . '</td>';
-                                echo '<td>' . htmlspecialchars($item['on_hand_count'] ?? '') . '</td>';
-                                echo '<td>' . htmlspecialchars($item['shortage_overage_qty'] ?? '') . '</td>';
-                                echo '<td class="currency">₱' . number_format($item['shortage_overage_value'] ?? 0, 2) . '</td>';
-                                echo '<td>' . htmlspecialchars($item['remarks'] ?? '') . '</td>';
+                                // Empty cells for manual input or future database integration
+                                echo '<td></td>'; // Unit of Measure
+                                echo '<td class="currency"></td>'; // Unit Value
+                                echo '<td></td>'; // Balance Per Card
+                                echo '<td></td>'; // On Hand Per Count
+                                echo '<td></td>'; // Shortage/Overage Quantity
+                                echo '<td class="currency"></td>'; // Shortage/Overage Value
+                                echo '<td></td>'; // Remarks
                                 echo '</tr>';
                             }
                         }
@@ -98,7 +112,7 @@ include 'sidebar.php';
                 <div class="signature-section">
                     <div class="signature-box">
                         <h4>Certified Correct by:</h4>
-                        <input type="text" class="signature-input" name="signature_name_X" placeholder="Signature over Printed Name">
+                        <input type="text" class="signature-input" name="signature_name_1" placeholder="Signature over Printed Name">
                         <div class="signature-text">
                             Signature over Printed Name of Inventory<br>
                             Committee Chair and Members
@@ -107,7 +121,7 @@ include 'sidebar.php';
                     
                     <div class="signature-box">
                         <h4>Approved by:</h4>
-                        <input type="text" class="signature-input" name="signature_name_X" placeholder="Signature over Printed Name">
+                        <input type="text" class="signature-input" name="signature_name_2" placeholder="Signature over Printed Name">
                         <div class="signature-text">
                             Signature over Printed Name of Head of Agency/Entity<br>
                             or Authorized Representative
@@ -116,7 +130,7 @@ include 'sidebar.php';
                     
                     <div class="signature-box">
                         <h4>Verified by:</h4>
-                        <input type="text" class="signature-input" name="signature_name_X" placeholder="Signature over Printed Name">
+                        <input type="text" class="signature-input" name="signature_name_3" placeholder="Signature over Printed Name">
                         <div class="signature-text">
                             Signature over Printed Name of COA Representative
                         </div>
