@@ -324,3 +324,17 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+CREATE TABLE item_history (
+    history_id INT AUTO_INCREMENT PRIMARY KEY,
+    item_id INT NOT NULL,
+    stock_number VARCHAR(255),
+    description TEXT,
+    unit VARCHAR(50),
+    reorder_point INT,
+    unit_cost DECIMAL(10,2),
+    quantity_on_hand INT,
+    changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    change_type VARCHAR(50) DEFAULT 'update',
+    FOREIGN KEY (item_id) REFERENCES items(item_id) ON DELETE CASCADE
+);

@@ -4,6 +4,33 @@ require 'functions.php';
 // Handle AJAX requests
 if (isset($_GET['action'])) {
     header('Content-Type: application/json');
+
+
+// save history (test)
+    function logItemHistory($conn, $item_id, $change_type = 'update') {
+    $stmt = $conn->prepare("SELECT * FROM items WHERE item_id = ?");
+    $stmt->bind_param("i", $item_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $item = $result->fetch_assoc();
+    $stmt->close();
+
+    $insert = $conn->prepare("INSERT INTO item_history 
+        (item_id, stock_number, description, unit, reorder_point, unit_cost, quantity_on_hand, change_type) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $insert->bind_param("isssidis", 
+        $item['item_id'], 
+        $item['stock_number'], 
+        $item['description'], 
+        $item['unit'], 
+        $item['reorder_point'], 
+        $item['unit_cost'], 
+        $item['quantity_on_hand'],
+        $change_type
+    );
+    $insert->execute();
+    $insert->close();
+}
     
     switch ($_GET['action']) {
         case 'check_stock':
@@ -85,6 +112,8 @@ if (isset($_GET['action'])) {
                         $update_qty_stmt->close();
 
                         updateAverageCost($conn, $existing_item['item_id']);
+                        //Log History
+                        logItemHistory($conn, $existing_item['item_id'], 'entry');
 
                         echo json_encode([
                             'success' => true, 
@@ -166,6 +195,8 @@ if (isset($_GET['action'])) {
                     $stmt->bind_param("sssii", $stock_number, $description, $unit, $reorder_point, $id);
                     
                     if ($stmt->execute()) {
+                    // Log history
+                    logItemHistory($conn, $id);
                     // Check if this item doesn't have an initial_quantity set yet
                     $check_initial_stmt = $conn->prepare("SELECT initial_quantity FROM items WHERE item_id = ?");
                     $check_initial_stmt->bind_param("i", $id);
@@ -184,6 +215,8 @@ if (isset($_GET['action'])) {
                     
                     // UPDATE AVERAGE COST - ADD THIS LINE:
                     updateAverageCost($conn, $id);
+                    //Log history
+                    logItemHistory($conn, $id);
                     
                     // Get current values for response
                     $get_stmt = $conn->prepare("SELECT * FROM items WHERE item_id = ?");
@@ -241,6 +274,8 @@ if (isset($_GET['action'])) {
                             $set_initial_stmt->close();
                         }
                         $check_initial_stmt->close();
+                        // Log history
+                        logItemHistory($conn, $id);
                         
                         echo json_encode([
                             'success' => true, 
@@ -314,6 +349,8 @@ if (isset($_GET['action'])) {
                     $update_stmt->bind_param("idi", $initial_quantity, $original_unit_cost, $item_id);
                     
                     if ($update_stmt->execute()) {
+                        //Log History
+                        logItemHistory($conn, $item_id, 'cleared');
                         echo json_encode(['success' => true, 'message' => 'All entries cleared successfully']);
                     } else {
                         echo json_encode(['success' => false, 'message' => 'Error updating item quantities']);
