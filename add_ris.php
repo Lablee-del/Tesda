@@ -2,6 +2,7 @@
 <?php require 'config.php'; ?>
 
 <?php
+require 'functions.php';
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
@@ -89,19 +90,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Only insert if there's an issued quantity or remarks
         if ($issued_qty > 0 || !empty($remark)) {
-            $stmt = $conn->prepare("INSERT INTO ris_items (ris_id, stock_number, stock_available, issued_quantity, remarks)
-                                   VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("issis", $ris_id, $stock_no, $stock_available, $issued_qty, $remark);
+            // GET THE CURRENT UNIT COST BEFORE ANY CHANGES - ADD THIS
+            $stmt = $conn->prepare("SELECT average_unit_cost FROM items WHERE stock_number = ?");
+            $stmt->bind_param("s", $stock_no);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $current_unit_cost = $result->fetch_assoc()['average_unit_cost'];
+            $stmt->close();
+
+            // MODIFY THE INSERT STATEMENT TO INCLUDE UNIT COST
+            $stmt = $conn->prepare("INSERT INTO ris_items (ris_id, stock_number, stock_available, issued_quantity, remarks, unit_cost_at_issue)
+                                VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ississ", $ris_id, $stock_no, $stock_available, $issued_qty, $remark, $current_unit_cost);
             $stmt->execute();
             $stmt->close();
 
             // Update inventory: deduct issued quantity
             if ($issued_qty > 0) {
+                // Deduct from main quantity
                 $stmt = $conn->prepare("UPDATE items SET quantity_on_hand = quantity_on_hand - ? WHERE stock_number = ?");
                 $stmt->bind_param("is", $issued_qty, $stock_no);
                 $stmt->execute();
                 $stmt->close();
+
+                // Get item_id
+                $stmt = $conn->prepare("SELECT item_id FROM items WHERE stock_number = ?");
+                $stmt->bind_param("s", $stock_no);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $item = $result->fetch_assoc();
+                $item_id = $item['item_id'];
+                $stmt->close();
+
+                // Insert a NEGATIVE entry but with ZERO cost (doesn't affect average)
+                $negative_qty = -$issued_qty;
+                $zero_cost = 0.00;
+                $stmt = $conn->prepare("INSERT INTO inventory_entries (item_id, quantity, unit_cost, created_at) VALUES (?, ?, ?, NOW())");
+                $stmt->bind_param("iid", $item_id, $negative_qty, $zero_cost);
+                $stmt->execute();
+                $stmt->close();
             }
+
+            // Recalculate average cost (this happens AFTER we've saved the original cost)
+            $stmt = $conn->prepare("SELECT item_id FROM items WHERE stock_number = ?");
+            $stmt->bind_param("s", $stock_no);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($row = $result->fetch_assoc()) {
+                $item_id = $row['item_id'];
+                updateAverageCost($conn, $item_id);
+            }
+            $stmt->close();
         }
     }
 
@@ -190,7 +229,7 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $is_editing ? 'Edit RIS Form' : 'Add RIS Form'; ?></title>
-    <link rel="stylesheet" href="path/to/your/combined.css">
+    <link rel="stylesheet" href="css/styles.css?v=<?= time() ?>">
 </head>
 <body>
     <div class="edit-ris-page content">
@@ -231,8 +270,14 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
             <input type="date" name="date_requested" value="<?php echo $ris_data['date_requested'] ?? ''; ?>" required>
 
             <h3>RIS Items</h3>
+            
+            <!-- Search Container -->
+            <div class="search-container">
+                <input type="text" id="itemSearch" class="search-input" placeholder="Search by Stock No., Description, or Unit..." onkeyup="filterItems()">
+            </div>
+            
             <div style="overflow-x:auto;">
-                <table>
+                <table id="itemsTable">
                     <thead>
                         <tr>
                             <th>Stock No.</th>
@@ -252,7 +297,7 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
                                 $stock_number = $row['stock_number'];
                                 $existing_item = $ris_items[$stock_number] ?? null;
                                 
-                                echo '<tr>';
+                                echo '<tr class="item-row" data-stock="' . htmlspecialchars(strtolower($stock_number)) . '" data-description="' . htmlspecialchars(strtolower($row['description'])) . '" data-unit="' . htmlspecialchars(strtolower($row['unit'])) . '">';
                                 echo '<td><input type="hidden" name="stock_number[]" value="' . htmlspecialchars($stock_number) . '">' . htmlspecialchars($stock_number) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['description']) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['unit']) . '</td>';
@@ -268,7 +313,7 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
                                 echo '</tr>';
                             }
                         } else {
-                            echo '<tr><td colspan="7">No inventory items found.</td></tr>';
+                            echo '<tr id="no-items-row"><td colspan="7">No inventory items found.</td></tr>';
                         }
                         ?>
                     </tbody>
@@ -299,5 +344,51 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
             </a>
         </form>
     </div>
+
+    <script>
+    function filterItems() {
+        // Get the search input value and convert to lowercase
+        const searchValue = document.getElementById('itemSearch').value.toLowerCase();
+        
+        // Get all item rows
+        const itemRows = document.querySelectorAll('.item-row');
+        
+        // Counter for visible rows
+        let visibleRows = 0;
+        
+        // Loop through each row
+        itemRows.forEach(function(row) {
+            // Get the data attributes (stock number, description, unit)
+            const stockNumber = row.getAttribute('data-stock');
+            const description = row.getAttribute('data-description');
+            const unit = row.getAttribute('data-unit');
+            
+            // Check if search value matches any of the fields
+            if (stockNumber.includes(searchValue) || 
+                description.includes(searchValue) || 
+                unit.includes(searchValue)) {
+                // Show the row
+                row.style.display = '';
+                visibleRows++;
+            } else {
+                // Hide the row
+                row.style.display = 'none';
+            }
+        });
+        
+        // Handle the "no items found" message
+        const noItemsRow = document.getElementById('no-items-row');
+        if (noItemsRow) {
+            if (visibleRows === 0 && searchValue.trim() !== '') {
+                // Show "no results found" message
+                noItemsRow.style.display = '';
+                noItemsRow.innerHTML = '<td colspan="7">No items match your search criteria.</td>';
+            } else {
+                // Hide the message
+                noItemsRow.style.display = 'none';
+            }
+        }
+    }
+    </script>
 </body>
 </html>

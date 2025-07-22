@@ -96,6 +96,98 @@ h2::after {
     animation: spin 1s ease-in-out infinite;
     margin-right: 8px;
 }
+.currency br {
+    line-height: 1.2;
+}
+
+td span br {
+    line-height: 1.2;
+}
+.quantity-cell, .cost-cell {
+    position: relative;
+}
+
+.main-quantity, .main-cost {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.sub-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sub-entry {
+    font-size: 0.85em;
+    color: #666;
+    padding: 2px 4px;
+    background-color: #f8f9fa;
+    border-radius: 3px;
+    border-left: 3px solid #007bff;
+}
+input[readonly] {
+    background-color: #f5f5f5 !important;
+    cursor: not-allowed;
+}
+.status-low strong,
+.status-normal strong {
+    border-top: 1px solid #ddd;
+    padding-top: 5px;
+    margin-top: 5px;
+    display: block;
+}
+/* Stock status indicator styles */
+.stock-status {
+    margin-top: 5px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid;
+}
+
+.stock-status.info {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border-color: #bbdefb;
+}
+
+.stock-status.success {
+    background-color: #e8f5e8;
+    color: #2e7d2e;
+    border-color: #c8e6c8;
+}
+
+.stock-status.error {
+    background-color: #ffebee;
+    color: #c62828;
+    border-color: #ffcdd2;
+}
+
+.text-info {
+    color: #1976d2 !important;
+}
+
+.text-success {
+    color: #2e7d2e !important;
+}
+
+.text-error {
+    color: #c62828 !important;
+}
+
+/* Form field styling for readonly state */
+input[readonly] {
+    background-color: #f5f5f5;
+    color: #666;
+    cursor: not-allowed;
+}
+
+input[readonly]:focus {
+    outline: none;
+    box-shadow: none;
+}
         
 @keyframes spin {
     to { transform: rotate(360deg); }
@@ -594,6 +686,22 @@ tbody tr:hover {
     color: var(--text-gray);
     font-style: italic;
     padding: 40px;
+}
+.clear-entries-btn {
+    background: #ff9800;
+    color: white;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+    width: 100%;
+}
+
+.clear-entries-btn:hover {
+    background: #f57c00;
 }
 
 /* sidebar.php*/

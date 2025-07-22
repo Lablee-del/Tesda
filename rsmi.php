@@ -29,13 +29,15 @@
                 require 'config.php';
 
                 $result = $conn->query("
-                    SELECT ris.ris_no, ri.stock_number, i.description, i.unit, ri.issued_quantity, i.unit_cost,
-                        (ri.issued_quantity * i.unit_cost) AS amount
+                    SELECT ris.ris_no, ri.stock_number, i.description, i.unit, ri.issued_quantity, 
+                        ri.unit_cost_at_issue AS unit_cost,
+                        (ri.issued_quantity * ri.unit_cost_at_issue) AS amount
                     FROM ris_items ri
                     JOIN ris ON ri.ris_id = ris.ris_id
                     JOIN items i ON ri.stock_number = i.stock_number
                     ORDER BY ris.date_requested DESC
                 ");
+
 
                 if ($result && $result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {

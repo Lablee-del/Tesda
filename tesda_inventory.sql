@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 09, 2025 at 01:52 PM
+-- Generation Time: Jul 22, 2025 at 07:38 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -24,110 +24,138 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `inventory_entries`
+--
+
+CREATE TABLE `inventory_entries` (
+  `entry_id` int(11) NOT NULL,
+  `item_id` int(11) DEFAULT NULL,
+  `quantity` int(11) NOT NULL,
+  `unit_cost` decimal(10,2) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `is_active` tinyint(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `inventory_entries`
+--
+
+INSERT INTO `inventory_entries` (`entry_id`, `item_id`, `quantity`, `unit_cost`, `created_at`, `is_active`) VALUES
+(82, 118, 10, 10.00, '2025-07-22 05:34:31', 1),
+(83, 1, 10, 10.00, '2025-07-22 05:34:59', 1);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `items`
 --
 
-DROP TABLE IF EXISTS `items`;
-
 CREATE TABLE `items` (
-  `item_id` INT(11) NOT NULL AUTO_INCREMENT,
-  `stock_number` VARCHAR(50) NOT NULL,
-  `description` VARCHAR(255) NOT NULL,
-  `unit` VARCHAR(50) NOT NULL,
-  `reorder_point` INT(11) DEFAULT NULL,
-  `unit_cost` DECIMAL(10,2) DEFAULT NULL,
-  `quantity_on_hand` INT(11) DEFAULT 0,
-  PRIMARY KEY (`item_id`)
+  `item_id` int(11) NOT NULL,
+  `stock_number` varchar(50) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `unit` varchar(50) NOT NULL,
+  `reorder_point` int(11) DEFAULT NULL,
+  `parent_item_id` int(11) DEFAULT NULL,
+  `quantity_on_hand` int(11) DEFAULT 0,
+  `unit_cost` decimal(10,2) DEFAULT 0.00,
+  `initial_quantity` int(11) DEFAULT 0,
+  `average_unit_cost` decimal(10,2) DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `items` (`stock_number`, `description`, `unit`, `reorder_point`, `unit_cost`, `quantity_on_hand`) VALUES
-('A.01.a', 'ARCHFILE FOLDER, Tagila Lock', 'pc', NULL, NULL, 0),
-('A.02.a', 'AIR FRESHINER REFILL, Automatic Spray Refill(glade)', 'can', NULL, NULL, 0),
-('A.03.a', 'ALCOHOL, 70% ethy/isopropyl, with moisturizer, gallon', 'gallon', NULL, NULL, 0),
-('A.03.b', 'ALCOHOL, 70% ethyl/isopropyl, 500ml', 'bottle', NULL, NULL, 0),
-('B.01.a', 'BATTERY, dry cell, AA, 4pcs/pack, 1.5V, heavy duty', 'pack', NULL, NULL, 0),
-('B.01.b', 'BATTERY, dry cell, AAA, 4pcs/pack, 1.5V, heavy duty', 'pack', NULL, NULL, 0),
-('B.01.c', 'BATTERY, dry cell, 9V1', 'pc', NULL, NULL, 0),
-('B.01.d', 'BATTERY, Li-on for thermo scanner', 'pc', NULL, NULL, 0),
-('B.02.a', 'BLEACH, Zonrox', 'gallon', NULL, NULL, 0),
-('C.01.a', 'CALCULATOR', 'pc', NULL, NULL, 0),
-('C.02.a', 'CERTIFICATE HOLDER, A4', 'pc', NULL, NULL, 0),
-('C.03.a', 'CLIP, backfold, large, 41mm, 12pcs/box', 'box', NULL, NULL, 0),
-('C.03.b', 'CLIP, backfold, medium, 25mm, 12pcs/box', 'box', NULL, NULL, 0),
-('C.03.c', 'CLIP, backfold, small, 19mm, 12pcs/box', 'box', NULL, NULL, 0),
-('C.03.d', 'CLIP, backfold, extra small, 15mm, 12pcs/box', 'box', NULL, NULL, 0),
-('C.04.a', 'CORRECTION TAPE, film based', 'pc', NULL, NULL, 0),
-('C.05.a', 'CUTTER PAPER, blade/knife', 'pc', NULL, NULL, 0),
-('C.06.a', 'CLING WRAP, 12inches x 300meters', 'roll', NULL, NULL, 0),
-('D.01.a', 'DISHWASHING LIQUID, 500ml', 'bottle', NULL, NULL, 0),
-('D.02.a', 'DISINFECTANT SPRAY, aerosol type', 'can', NULL, NULL, 0),
-('D.03.a', 'DRAWER LOCK, set with key', 'set', NULL, NULL, 0),
-('E.01.a', 'ENVELOPE EXPANDABLE , brown, long', 'pc', NULL, NULL, 0),
-('F.01.a', 'FASTENER, plastic', 'box', NULL, NULL, 0),
-('F.02.a', 'FOLDER, Tag Board, White, 100pcs/pack, Long', 'pack', NULL, NULL, 0),
-('F.02.b', 'FOLDER EXPANDING, Long, pressboard 100pcs/pack, white & blue', 'pack', NULL, NULL, 0),
-('F.03.a', 'FABRIC CONDITIONER, Softener', 'gallon', NULL, NULL, 0),
-('G.01.a', 'GLUE STICK, all purpose, 22 grams,', 'pc', NULL, NULL, 0),
-('G.02.a', 'GLASS CLEANER, with Spray cap 500ml', 'bottle', NULL, NULL, 0),
-('H.01.a', 'HANDSOAP, Liquid, 500ml', 'btl', NULL, NULL, 0),
-('I.01.a', 'INDEX TAB', 'box', NULL, NULL, 0),
-('I.02.a', 'INK, Canon, GI 790, Magenta', 'bottle', NULL, NULL, 0),
-('I.02.b', 'INK, Canon, GI 790, Yellow', 'bottle', NULL, NULL, 0),
-('I.02.c', 'INK, Canon, GI 790, Black', 'bottle', NULL, NULL, 0),
-('I.02.d', 'INK, Canon, GI 790, Cyan', 'bottle', NULL, NULL, 0),
-('I.03.a', 'INK HP, 682, black', 'cart', NULL, NULL, 0),
-('I.03.b', 'INK HP, 682, colored', 'cart', NULL, NULL, 0),
-('I.04.a', 'INK, Canon, 810 Black', 'cart', NULL, NULL, 0),
-('I.04.b', 'INK, Canon, 811 Colored', 'cart', NULL, NULL, 0),
-('I.05.a', 'INK, Epson 003, Black', 'bottle', NULL, NULL, 0),
-('I.05.b', 'INK, Epson 003, Cyan', 'bottle', NULL, NULL, 0),
-('I.05.c', 'INK, Epson 003, Magenta', 'bottle', NULL, NULL, 0),
-('I.05.d', 'INK, Epson 003, Yellow', 'bottle', NULL, NULL, 0),
-('I.06.a', 'INSECTICIDE, Aerosol type, waterbased, 600ml/can', 'can', NULL, NULL, 0),
-('K.01.a', 'KITCHEN TOWEL, Paper Towel, roll, 2ply', 'roll', NULL, NULL, 0),
-('L.01.a', 'LED BULB', 'pc', NULL, NULL, 0),
-('N.01.a', 'NOTARIAL SEAL', 'pack', NULL, NULL, 0),
-('N.02.a', 'NOTE PAD, stick on, 2\"x3\"', 'pc', NULL, NULL, 0),
-('N.02.b', 'NOTE PAD, stick on, 3\"x3\"', 'pc', NULL, NULL, 0),
-('N.02.c', 'NOTE PAD, stick on, 4\"x3\"', 'pc', NULL, NULL, 0),
-('N.02.d', 'NOTE PAD, stick on, d3-4 (4\'s -1\"x3\")', 'pc', NULL, NULL, 0),
-('P.01.a', 'PAPER, Board, A4, white, 180gsm, 100sheets/pack', 'pack', NULL, NULL, 0),
-('P.01.b', 'PAPER, Board, A4, white, 200gsm, 100sheets/pack', 'pack', NULL, NULL, 0),
-('P.01.c', 'PAPER, Board, Morocco, A4, 200gsm, 100sheets/pack', 'pack', NULL, NULL, 0),
-('P.02.a', 'PAPER CLIP, 50mm, jumbo, vinyl coated', 'box', NULL, NULL, 0),
-('P.02.b', 'PAPER CLIP, 33mm, vinyl coated', 'box', NULL, NULL, 0),
-('P.03.a', 'PAPER, Multicopy, PPC, s20, 8.5\" x 13\"', 'ream', NULL, NULL, 0),
-('P.03.b', 'PAPER, Multicopy, PPC, s20, 8.5\" x 14\"', 'ream', NULL, NULL, 0),
-('P.03.c', 'PAPER, Multicopy, PPC, s20, A4', 'ream', NULL, NULL, 0),
-('P.03.d', 'PAPER, Multicopy, PPC, s20, Short', 'ream', NULL, NULL, 0),
-('P.04.a', 'PEN SIGN, gel or liquid ink, retractable, 0.7mm Black/ Blue, 12pcs/box', 'box', NULL, NULL, 0),
-('p.04.b', 'PEN SIGN, Hi-tecpoint V10Grip, 1.0, 12pcs/box, Black/Blue', 'box', NULL, NULL, 0),
-('P.04.c', 'PEN, ballpoint, retractable, 0.7mm, Black/Blue', 'box', NULL, NULL, 0),
-('P.04.d', 'PEN, Fine, Retractable, 0.5mm', 'pc', NULL, NULL, 0),
-('P.05.a', 'POST IT- Sticky Note, \"Sign Here\", \"Please Sign\",', 'pack', NULL, NULL, 0),
-('P.06.a', 'PUSH PINS, 100pcs/box', 'box', NULL, NULL, 0),
-('R.01.a', 'RECORD BOOK, Logbook, 300 pages', 'pc', NULL, NULL, 0),
-('R.02.a', 'RULER, Steel, 12 inches', 'pc', NULL, NULL, 0),
-('R.03.a', 'RAGS', 'pc', NULL, NULL, 0),
-('S.01.a', 'STAPLER', 'pc', NULL, NULL, 0),
-('S.01.b', 'STAPLE WIRE, Standard, 5000 staples/box', 'box', NULL, NULL, 0),
-('S.01.c', 'STAPLE WIRE, Bostitch, 5000 staples/box', 'box', NULL, NULL, 0),
-('S.01.d', 'STAPLER REMOVER', 'pc', NULL, NULL, 0),
-('S.02.a', 'SCOURING PAD, Dishwashing sponge', 'pc', NULL, NULL, 0),
-('T.01.a', 'TAPE, clear, 1inch', 'roll', NULL, NULL, 0),
-('T.01.b', 'TAPE, Cloth, Duct tape', 'roll', NULL, NULL, 0),
-('T.01.c', 'TAPE, double sided, 1inch', 'roll', NULL, NULL, 0),
-('T.01.d', 'TAPE, Packing, 2\"', 'roll', NULL, NULL, 0),
-('T.01.e', 'TAPE, transparent, 2\"', 'roll', NULL, NULL, 0),
-('T.01.f', 'TAPE, transparent, 3\"', 'roll', NULL, NULL, 0),
-('T.02.a', 'TAPE, refill for Epson LW-K400 printer/label 12mm', 'pcs', NULL, NULL, 0),
-('T.03.a', 'TAPE DISPENSER', 'pc', NULL, NULL, 0),
-('T.04.a', 'TOILET BOWL BRUSH, round headed brush', 'pc', NULL, NULL, 0),
-('T.04.b', 'TOILET BOWL CLEANER, Liquid, 900ml', 'bottle', NULL, NULL, 0),
-('T.05.a', 'TISSUE BATHROOM, Green Tea, 180g, 10pcs/pack', 'pack', NULL, NULL, 0),
-('T.05.b', 'TISSUE FACIAL, Econo Box, 2ply, 200-250pulls', 'box', NULL, NULL, 0),
-('T.05.c', 'TOILET TISSUE PAPER, 2ply, 12\'s per pack, 1000 sheets per roll', 'pack', NULL, NULL, 0),
-('U.01.a', 'USB, Flash Drive, 64GB', 'pc', NULL, NULL, 0);
+--
+-- Dumping data for table `items`
+--
+
+INSERT INTO `items` (`item_id`, `stock_number`, `description`, `unit`, `reorder_point`, `parent_item_id`, `quantity_on_hand`, `unit_cost`, `initial_quantity`, `average_unit_cost`) VALUES
+(1, 'A.01.a', 'ARCHFILE FOLDER, Tagila Lock', 'pc', 10, NULL, 20, 12.00, 10, 11.00),
+(2, 'A.02.a', 'AIR FRESHINER REFILL, Automatic Spray Refill(glade)', 'can', 0, NULL, 1, 1.00, 10, 0.00),
+(3, 'A.03.a', 'ALCOHOL, 70% ethy/isopropyl, with moisturizer, gallon', 'gallon', NULL, NULL, 0, 0.00, 0, 0.00),
+(4, 'A.03.b', 'ALCOHOL, 70% ethyl/isopropyl, 500ml', 'bottle', NULL, NULL, 0, 0.00, 0, 0.00),
+(5, 'B.01.a', 'BATTERY, dry cell, AA, 4pcs/pack, 1.5V, heavy duty', 'pack', NULL, NULL, 0, 0.00, 0, 0.00),
+(6, 'B.01.b', 'BATTERY, dry cell, AAA, 4pcs/pack, 1.5V, heavy duty', 'pack', NULL, NULL, 0, 0.00, 0, 0.00),
+(7, 'B.01.c', 'BATTERY, dry cell, 9V1', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(8, 'B.01.d', 'BATTERY, Li-on for thermo scanner', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(9, 'B.02.a', 'BLEACH, Zonrox', 'gallon', NULL, NULL, 0, 0.00, 0, 0.00),
+(10, 'C.01.a', 'CALCULATOR', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(11, 'C.02.a', 'CERTIFICATE HOLDER, A4', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(12, 'C.03.a', 'CLIP, backfold, large, 41mm, 12pcs/box', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(13, 'C.03.b', 'CLIP, backfold, medium, 25mm, 12pcs/box', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(14, 'C.03.c', 'CLIP, backfold, small, 19mm, 12pcs/box', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(15, 'C.03.d', 'CLIP, backfold, extra small, 15mm, 12pcs/box', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(16, 'C.04.a', 'CORRECTION TAPE, film based', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(17, 'C.05.a', 'CUTTER PAPER, blade/knife', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(18, 'C.06.a', 'CLING WRAP, 12inches x 300meters', 'roll', NULL, NULL, 0, 0.00, 0, 0.00),
+(19, 'D.01.a', 'DISHWASHING LIQUID, 500ml', 'bottle', NULL, NULL, 0, 0.00, 0, 0.00),
+(20, 'D.02.a', 'DISINFECTANT SPRAY, aerosol type', 'can', NULL, NULL, 0, 0.00, 0, 0.00),
+(21, 'D.03.a', 'DRAWER LOCK, set with key', 'set', NULL, NULL, 0, 0.00, 0, 0.00),
+(22, 'E.01.a', 'ENVELOPE EXPANDABLE , brown, long', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(23, 'F.01.a', 'FASTENER, plastic', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(24, 'F.02.a', 'FOLDER, Tag Board, White, 100pcs/pack, Long', 'pack', NULL, NULL, 0, 0.00, 0, 0.00),
+(25, 'F.02.b', 'FOLDER EXPANDING, Long, pressboard 100pcs/pack, white & blue', 'pack', NULL, NULL, 0, 0.00, 0, 0.00),
+(26, 'F.03.a', 'FABRIC CONDITIONER, Softener', 'gallon', NULL, NULL, 0, 0.00, 0, 0.00),
+(27, 'G.01.a', 'GLUE STICK, all purpose, 22 grams,', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(28, 'G.02.a', 'GLASS CLEANER, with Spray cap 500ml', 'bottle', NULL, NULL, 0, 0.00, 0, 0.00),
+(29, 'H.01.a', 'HANDSOAP, Liquid, 500ml', 'btl', NULL, NULL, 0, 0.00, 0, 0.00),
+(30, 'I.01.a', 'INDEX TAB', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(31, 'I.02.a', 'INK, Canon, GI 790, Magenta', 'bottle', NULL, NULL, 0, 0.00, 0, 0.00),
+(32, 'I.02.b', 'INK, Canon, GI 790, Yellow', 'bottle', NULL, NULL, 0, 0.00, 0, 0.00),
+(33, 'I.02.c', 'INK, Canon, GI 790, Black', 'bottle', NULL, NULL, 0, 0.00, 0, 0.00),
+(34, 'I.02.d', 'INK, Canon, GI 790, Cyan', 'bottle', NULL, NULL, 0, 0.00, 0, 0.00),
+(35, 'I.03.a', 'INK HP, 682, black', 'cart', NULL, NULL, 0, 0.00, 0, 0.00),
+(36, 'I.03.b', 'INK HP, 682, colored', 'cart', NULL, NULL, 0, 0.00, 0, 0.00),
+(37, 'I.04.a', 'INK, Canon, 810 Black', 'cart', NULL, NULL, 0, 0.00, 0, 0.00),
+(38, 'I.04.b', 'INK, Canon, 811 Colored', 'cart', NULL, NULL, 0, 0.00, 0, 0.00),
+(39, 'I.05.a', 'INK, Epson 003, Black', 'bottle', NULL, NULL, 0, 0.00, 0, 0.00),
+(40, 'I.05.b', 'INK, Epson 003, Cyan', 'bottle', NULL, NULL, 0, 0.00, 0, 0.00),
+(41, 'I.05.c', 'INK, Epson 003, Magenta', 'bottle', NULL, NULL, 0, 0.00, 0, 0.00),
+(42, 'I.05.d', 'INK, Epson 003, Yellow', 'bottle', NULL, NULL, 0, 0.00, 0, 0.00),
+(43, 'I.06.a', 'INSECTICIDE, Aerosol type, waterbased, 600ml/can', 'can', NULL, NULL, 0, 0.00, 0, 0.00),
+(44, 'K.01.a', 'KITCHEN TOWEL, Paper Towel, roll, 2ply', 'roll', NULL, NULL, 0, 0.00, 0, 0.00),
+(45, 'L.01.a', 'LED BULB', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(46, 'N.01.a', 'NOTARIAL SEAL', 'pack', NULL, NULL, 0, 0.00, 0, 0.00),
+(47, 'N.02.a', 'NOTE PAD, stick on, 2\"x3\"', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(48, 'N.02.b', 'NOTE PAD, stick on, 3\"x3\"', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(49, 'N.02.c', 'NOTE PAD, stick on, 4\"x3\"', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(50, 'N.02.d', 'NOTE PAD, stick on, d3-4 (4\'s -1\"x3\")', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(51, 'P.01.a', 'PAPER, Board, A4, white, 180gsm, 100sheets/pack', 'pack', NULL, NULL, 0, 0.00, 0, 0.00),
+(52, 'P.01.b', 'PAPER, Board, A4, white, 200gsm, 100sheets/pack', 'pack', NULL, NULL, 0, 0.00, 0, 0.00),
+(53, 'P.01.c', 'PAPER, Board, Morocco, A4, 200gsm, 100sheets/pack', 'pack', NULL, NULL, 0, 0.00, 0, 0.00),
+(54, 'P.02.a', 'PAPER CLIP, 50mm, jumbo, vinyl coated', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(55, 'P.02.b', 'PAPER CLIP, 33mm, vinyl coated', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(56, 'P.03.a', 'PAPER, Multicopy, PPC, s20, 8.5\" x 13\"', 'ream', NULL, NULL, 0, 0.00, 0, 0.00),
+(57, 'P.03.b', 'PAPER, Multicopy, PPC, s20, 8.5\" x 14\"', 'ream', NULL, NULL, 0, 0.00, 0, 0.00),
+(58, 'P.03.c', 'PAPER, Multicopy, PPC, s20, A4', 'ream', NULL, NULL, 0, 0.00, 0, 0.00),
+(59, 'P.03.d', 'PAPER, Multicopy, PPC, s20, Short', 'ream', NULL, NULL, 0, 0.00, 0, 0.00),
+(60, 'P.04.a', 'PEN SIGN, gel or liquid ink, retractable, 0.7mm Black/ Blue, 12pcs/box', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(61, 'p.04.b', 'PEN SIGN, Hi-tecpoint V10Grip, 1.0, 12pcs/box, Black/Blue', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(62, 'P.04.c', 'PEN, ballpoint, retractable, 0.7mm, Black/Blue', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(63, 'P.04.d', 'PEN, Fine, Retractable, 0.5mm', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(64, 'P.05.a', 'POST IT- Sticky Note, \"Sign Here\", \"Please Sign\",', 'pack', NULL, NULL, 0, 0.00, 0, 0.00),
+(65, 'P.06.a', 'PUSH PINS, 100pcs/box', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(66, 'R.01.a', 'RECORD BOOK, Logbook, 300 pages', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(67, 'R.02.a', 'RULER, Steel, 12 inches', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(68, 'R.03.a', 'RAGS', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(69, 'S.01.a', 'STAPLER', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(70, 'S.01.b', 'STAPLE WIRE, Standard, 5000 staples/box', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(71, 'S.01.c', 'STAPLE WIRE, Bostitch, 5000 staples/box', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(72, 'S.01.d', 'STAPLER REMOVER', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(73, 'S.02.a', 'SCOURING PAD, Dishwashing sponge', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(74, 'T.01.a', 'TAPE, clear, 1inch', 'roll', NULL, NULL, 0, 0.00, 0, 0.00),
+(75, 'T.01.b', 'TAPE, Cloth, Duct tape', 'roll', NULL, NULL, 0, 0.00, 0, 0.00),
+(76, 'T.01.c', 'TAPE, double sided, 1inch', 'roll', NULL, NULL, 0, 0.00, 0, 0.00),
+(77, 'T.01.d', 'TAPE, Packing, 2\"', 'roll', NULL, NULL, 0, 0.00, 0, 0.00),
+(78, 'T.01.e', 'TAPE, transparent, 2\"', 'roll', NULL, NULL, 0, 0.00, 0, 0.00),
+(79, 'T.01.f', 'TAPE, transparent, 3\"', 'roll', NULL, NULL, 0, 0.00, 0, 0.00),
+(80, 'T.02.a', 'TAPE, refill for Epson LW-K400 printer/label 12mm', 'pcs', NULL, NULL, 0, 0.00, 0, 0.00),
+(81, 'T.03.a', 'TAPE DISPENSER', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(82, 'T.04.a', 'TOILET BOWL BRUSH, round headed brush', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(83, 'T.04.b', 'TOILET BOWL CLEANER, Liquid, 900ml', 'bottle', NULL, NULL, 0, 0.00, 0, 0.00),
+(84, 'T.05.a', 'TISSUE BATHROOM, Green Tea, 180g, 10pcs/pack', 'pack', NULL, NULL, 0, 0.00, 0, 0.00),
+(85, 'T.05.b', 'TISSUE FACIAL, Econo Box, 2ply, 200-250pulls', 'box', NULL, NULL, 0, 0.00, 0, 0.00),
+(86, 'T.05.c', 'TOILET TISSUE PAPER, 2ply, 12\'s per pack, 1000 sheets per roll', 'pack', NULL, NULL, 0, 0.00, 0, 0.00),
+(87, 'U.01.a', 'USB, Flash Drive, 64GB', 'pc', NULL, NULL, 0, 0.00, 0, 0.00),
+(118, 'qwe', 'qwe', 'q', 10, NULL, 29, 5.00, 19, 6.72);
 
 -- --------------------------------------------------------
 
@@ -157,7 +185,8 @@ CREATE TABLE `ris` (
 --
 
 INSERT INTO `ris` (`ris_id`, `entity_name`, `fund_cluster`, `division`, `office`, `responsibility_center_code`, `ris_no`, `date_requested`, `purpose`, `requested_by`, `approved_by`, `issued_by`, `received_by`, `created_at`) VALUES
-(14, '123', 'qweq', 'qwe', 'qwe', 'qe', '2025/07/0001', '2025-07-09', '', '123', 'qwe', 'qwe', 'qe', '2025-07-09 11:47:50');
+(19, 'qwe', 'qwe', 'ORD', 'TESDA CAR', 'qwe', '2025/07/0001', '2025-07-22', 'qwe', 'qwe', 'qwe', 'qwe', 'qwe', '2025-07-22 05:17:47'),
+(21, 'qwe', 'qwe', 'ORD', 'TESDA CAR', 'qwe', '2025/07/0002', '2025-07-22', 'qwe', 'qwe', 'qwe', 'qwe', 'qwe', '2025-07-22 05:32:00');
 
 -- --------------------------------------------------------
 
@@ -171,8 +200,17 @@ CREATE TABLE `ris_items` (
   `stock_number` varchar(100) DEFAULT NULL,
   `stock_available` varchar(10) DEFAULT NULL,
   `issued_quantity` int(11) DEFAULT NULL,
-  `remarks` text DEFAULT NULL
+  `remarks` text DEFAULT NULL,
+  `unit_cost_at_issue` decimal(10,2) DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `ris_items`
+--
+
+INSERT INTO `ris_items` (`item_id`, `ris_id`, `stock_number`, `stock_available`, `issued_quantity`, `remarks`, `unit_cost_at_issue`) VALUES
+(0, 19, 'qwe', 'Yes', 4, 'qwe', 7.22),
+(0, 21, 'A.01.a', 'Yes', 5, 'qwe', 14.00);
 
 -- --------------------------------------------------------
 
@@ -227,30 +265,16 @@ CREATE TABLE `stock_card` (
   `issued_to_office` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-------------------------------------------------------------------------
-DROP TABLE IF EXISTS `rpci`;
-
-CREATE TABLE `rpci` (
-  `rpci_id` INT(11) NOT NULL AUTO_INCREMENT,
-  `inventory_type` VARCHAR(100) DEFAULT NULL,
-  `as_of_date` DATE DEFAULT NULL,
-  `fund_cluster` VARCHAR(50) DEFAULT NULL,
-  `article` VARCHAR(100) DEFAULT NULL,
-  `description` VARCHAR(255) DEFAULT NULL,
-  `stock_number` VARCHAR(50) DEFAULT NULL,
-  `unit` VARCHAR(50) DEFAULT NULL,
-  `unit_value` DECIMAL(10,2) DEFAULT NULL,
-  `balance_per_card` INT(11) DEFAULT NULL,
-  `on_hand_per_count` INT(11) DEFAULT NULL,
-  `shortage` INT(11) DEFAULT 0,
-  `overage` INT(11) DEFAULT 0,
-  `remarks` VARCHAR(255) DEFAULT NULL,
-  PRIMARY KEY (`rpci_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `inventory_entries`
+--
+ALTER TABLE `inventory_entries`
+  ADD PRIMARY KEY (`entry_id`),
+  ADD KEY `item_id` (`item_id`);
 
 --
 -- Indexes for table `items`
@@ -265,86 +289,36 @@ ALTER TABLE `ris`
   ADD PRIMARY KEY (`ris_id`);
 
 --
--- Indexes for table `ris_items`
---
-ALTER TABLE `ris_items`
-  ADD PRIMARY KEY (`item_id`),
-  ADD KEY `ris_id` (`ris_id`);
-
---
--- Indexes for table `rpci`
---
-ALTER TABLE `rpci`
-  ADD PRIMARY KEY (`rpci_id`);
-
---
--- Indexes for table `rsmi`
---
-ALTER TABLE `rsmi`
-  ADD PRIMARY KEY (`rsmi_id`);
-
---
--- Indexes for table `stock_card`
---
-ALTER TABLE `stock_card`
-  ADD PRIMARY KEY (`stock_card_id`),
-  ADD KEY `item_id` (`item_id`);
-
---
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `inventory_entries`
+--
+ALTER TABLE `inventory_entries`
+  MODIFY `entry_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 
 --
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=115;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
 
 --
 -- AUTO_INCREMENT for table `ris`
 --
 ALTER TABLE `ris`
-  MODIFY `ris_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
-
---
--- AUTO_INCREMENT for table `ris_items`
---
-ALTER TABLE `ris_items`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=648;
-
---
--- AUTO_INCREMENT for table `rpci`
---
-ALTER TABLE `rpci`
-  MODIFY `rpci_id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `rsmi`
---
-ALTER TABLE `rsmi`
-  MODIFY `rsmi_id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `stock_card`
---
-ALTER TABLE `stock_card`
-  MODIFY `stock_card_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ris_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `ris_items`
+-- Constraints for table `inventory_entries`
 --
-ALTER TABLE `ris_items`
-  ADD CONSTRAINT `ris_items_ibfk_1` FOREIGN KEY (`ris_id`) REFERENCES `ris` (`ris_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `stock_card`
---
-ALTER TABLE `stock_card`
-  ADD CONSTRAINT `stock_card_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`);
+ALTER TABLE `inventory_entries`
+  ADD CONSTRAINT `inventory_entries_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
