@@ -105,6 +105,7 @@
                                 <th>Reorder Point</th>
                                 <th>Unit Cost (₱)</th>
                                 <th>Quantity</th>
+                                <th>Qty Change</th>
                                 <th>Type</th>
                             </tr>
                         </thead>
@@ -116,8 +117,11 @@
                                     <td><?= htmlspecialchars($h['description']) ?></td>
                                     <td><?= htmlspecialchars($h['unit']) ?></td>
                                     <td><?= htmlspecialchars($h['reorder_point']) ?></td>
-                                    <td>₱ <?= number_format($h['unit_cost'], 2) ?></td>
+                                    <td><?= number_format($h['unit_cost'], 2) ?></td>
                                     <td><?= htmlspecialchars($h['quantity_on_hand']) ?></td>
+                                    <td style="color: <?= $h['quantity_change'] > 0 ? 'green' : ($h['quantity_change'] < 0 ? 'red' : 'gray') ?>;">
+                                        <?= $h['quantity_change'] > 0 ? '+' : '' ?><?= $h['quantity_change'] ?>
+                                    </td>
                                     <td><?= ucfirst($h['change_type']) ?></td>
                                 </tr>
                             <?php endforeach; ?>

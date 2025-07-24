@@ -338,3 +338,7 @@ CREATE TABLE item_history (
     change_type VARCHAR(50) DEFAULT 'update',
     FOREIGN KEY (item_id) REFERENCES items(item_id) ON DELETE CASCADE
 );
+
+ALTER TABLE item_history ADD COLUMN quantity_change INT AFTER quantity_on_hand;
+
+ALTER TABLE item_history ADD COLUMN change_direction VARCHAR(20) AFTER quantity_change;

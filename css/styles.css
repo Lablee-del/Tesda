@@ -1727,3 +1727,10 @@ tbody tr:hover {
     flex-wrap: wrap;
     margin-bottom: 20px;
 }
+
+
+.btn-danger {
+    position: absolute!important;
+    right: 5 !important;
+    height: 53px !important;
+}
