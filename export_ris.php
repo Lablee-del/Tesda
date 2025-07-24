@@ -126,7 +126,7 @@ $item_result = $conn->query($item_query);
         }
         
         .purpose-section {
-            width: 100%;
+            width: 97.8%;
             border: 1px solid #000;
             padding: 8px;
             margin-bottom: 15px;
