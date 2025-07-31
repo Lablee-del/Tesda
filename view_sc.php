@@ -85,7 +85,8 @@
 
         <div class="ris-details">
             <p><strong>Entity Name:</strong> <?php echo "TESDA"; ?></p>
-            <p><strong>Item:</strong> <?php echo htmlspecialchars($items['description']); ?></p>
+            <p><strong>Item:</strong> <?php echo htmlspecialchars($items['item_name']); ?></p>
+            <p><strong>Description:</strong> <?php echo htmlspecialchars($items['description']); ?></p>
             <p><strong>Quantity:</strong> <?php echo htmlspecialchars($items['quantity_on_hand']); ?></p>
             <p><strong>Stock No.:</strong> <?php echo htmlspecialchars($items['stock_number']); ?></p>
             <p><strong>Unit of Measurement:</strong> <?php echo htmlspecialchars($items['unit']); ?></p>

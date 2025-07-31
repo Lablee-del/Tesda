@@ -16,7 +16,7 @@
 
     
 <div class="search-container-sc">
-            <input type="text" id="searchInput" class="search-input-sc" placeholder="Search by stock number, description, or unit...">
+            <input type="text" id="searchInput" class="search-input-sc" placeholder="Search by stock number, item, or unit...">
 </div>
 
 
@@ -42,10 +42,11 @@
 
         rows.forEach(row => {
             const stockNo = row.cells[0].textContent.toLowerCase();
-            const description = row.cells[1].textContent.toLowerCase();
-            const unit = row.cells[2].textContent.toLowerCase();
+            const stockNO = row.cells[1].textContent.toLowerCase(); 
+            const description = row.cells[2].textContent.toLowerCase();
+            const unit = row.cells[3].textContent.toLowerCase();
 
-            const match = stockNo.includes(filter) || description.includes(filter) || unit.includes(filter);
+            const match = stockNo.includes(filter) || item_name.includes(filter) || description.includes(filter) || unit.includes(filter);
             row.style.display = match ? '' : 'none';
         });
     });
