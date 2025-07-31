@@ -190,7 +190,7 @@ $ris = ['entity_name' => 'TESDA'];
         <td style="width:34%;"></td>
       </tr>
       <tr>
-        <td><span class="meta-label">Item:</span> <span class="field-line"><?php echo htmlspecialchars($items['description']); ?></span></td>
+        <td><span class="meta-label">Item:</span> <span class="field-line"><?php echo htmlspecialchars($items['item_name']); ?></span></td>
         <td><span class="meta-label">Stock No.:</span> <span class="field-line"><?php echo htmlspecialchars($items['stock_number']); ?></span></td>
         <td></td>
       </tr>
@@ -225,7 +225,7 @@ $ris = ['entity_name' => 'TESDA'];
         <?php if (count($history_rows) > 0): ?>
           <?php foreach ($history_rows as $h):
             $date = date('M d, Y', strtotime($h['changed_at']));
-            $reference = ucfirst(htmlspecialchars($h['change_type'])); // adapt if you have a better reference field
+            $reference = ucfirst(htmlspecialchars($h['change_type'])); 
             $receipt_qty = $h['quantity_change'] > 0 ? htmlspecialchars($h['quantity_change']) : '';
             $issue_qty = $h['quantity_change'] < 0 ? abs(htmlspecialchars($h['quantity_change'])) : '';
             $office = ''; // fill if you have office info
