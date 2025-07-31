@@ -5,12 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RSMI - Report on Stock of Materials and Supplies Issued</title>
     <link rel="stylesheet" href="css/styles.css?v=<?= time() ?>">
+    <style>
+        .export-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .export-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .export-btn:hover {
+            background-color: #218838;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .export-btn i {
+            margin-right: 5px;
+        }
+    </style>
 </head>
 <body>
     <?php include 'sidebar.php'; ?>
 
     <div class="content">
         <h2>Report on the Stock of Materials and Supplies Issued (RSMI)</h2>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <a href="rsmi_export.php" class="export-btn" target="_blank">
+                📄 Export to PDF
+            </a>
+        </div>
 
         <table>
             <thead>
@@ -37,7 +76,6 @@
                     JOIN items i ON ri.stock_number = i.stock_number
                     ORDER BY ris.date_requested DESC
                 ");
-
 
                 if ($result && $result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
