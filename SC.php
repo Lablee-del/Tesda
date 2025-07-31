@@ -25,6 +25,7 @@
             <tr>
                 <th><i class=""></i> Stock No.</th>
                 <th><i class=""></i> Item</th>
+                <th><i class=""></i> Description</th>
                 <th><i class=""></i> Unit of Measurement</th>
                 <th><i class=""></i> Reorder Point</th>
                 <th><i class=""></i> Actions</th>
@@ -60,6 +61,7 @@
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr data-id='{$row['item_id']}'>
                             <td><strong>{$row['stock_number']}</strong></td>
+                            <td>{$row['item_name']}</td>
                             <td>{$row['description']}</td>
                             <td>{$row['unit']}</td>
                             <td>{$row['reorder_point']}</td>
@@ -67,7 +69,7 @@
                                 <a href='view_sc.php?item_id={$row['item_id']}' title='View SC'>
                                     <i class='fas fa-eye'></i> View
                                 </a>
-                                <a class='scexport' href='export_sc.php?item_id={$row['item_id']}' title='Export SC'>
+                                <a class='scexport' href='sc_export.php?item_id={$row['item_id']}' title='Export SC'>
                                     <i class='fas fa-download'></i> Export
                                 </a>
                             

@@ -13,10 +13,11 @@ document.getElementById('searchInput').addEventListener('input', function() {
             const cells = rows[i].getElementsByTagName('td');
             if (cells.length > 0) {
                 const stockNumber = cells[0].textContent.toLowerCase();
-                const description = cells[1].textContent.toLowerCase();
-                const unit = cells[2].textContent.toLowerCase();
+                const item_name = cells[1].textContent.toLowerCase();
+                const description = cells[2].textContent.toLowerCase();
+                const unit = cells[3].textContent.toLowerCase();
 
-                if (stockNumber.includes(filter) || description.includes(filter) || unit.includes(filter)) {
+                if (stockNumber.includes(filter) || item_name.includes(filter) || description.includes(filter) || unit.includes(filter)) {
                     rows[i].style.display = '';
                 } else {
                     rows[i].style.display = 'none';
@@ -64,12 +65,14 @@ function checkStockNumber(stockNumber) {
             statusDiv.innerHTML = '<i class="fas fa-info-circle text-info"></i> Existing item found. You can add different unit cost.';
             statusDiv.className = 'stock-status info';
             
+            document.getElementById('add_item_name').value = data.item.item_name;
             document.getElementById('add_description').value = data.item.description;
             document.getElementById('add_unit').value = data.item.unit;
             document.getElementById('add_reorder_point').value = data.item.reorder_point;
             document.getElementById('add_unit_cost').value = data.item.unit_cost;
             
             // Make only description, unit, and reorder_point readonly
+            document.getElementById('add_item_name').readOnly = true;
             document.getElementById('add_description').readOnly = true;
             document.getElementById('add_unit').readOnly = true;
             document.getElementById('add_reorder_point').readOnly = true;
@@ -95,6 +98,7 @@ function checkStockNumber(stockNumber) {
 
 function clearAddForm() {
     // Clear all form fields except stock number
+    document.getElementById('add_item_name').value = '';
     document.getElementById('add_description').value = '';
     document.getElementById('add_unit').value = '';
     document.getElementById('add_reorder_point').value = '';
@@ -102,6 +106,7 @@ function clearAddForm() {
     document.getElementById('add_quantity_on_hand').value = '';
     
     // Make fields readonly
+    document.getElementById('add_item_name').readOnly = true;
     document.getElementById('add_description').readOnly = true;
     document.getElementById('add_unit').readOnly = true;
     document.getElementById('add_reorder_point').readOnly = true;
@@ -110,12 +115,14 @@ function clearAddForm() {
 
 function enableAddFormFields() {
     // Enable all fields for new item entry
+    document.getElementById('add_item_name').readOnly = false;
     document.getElementById('add_description').readOnly = false;
     document.getElementById('add_unit').readOnly = false;
     document.getElementById('add_reorder_point').readOnly = false;
     document.getElementById('add_unit_cost').readOnly = false; // Keep this enabled
     
     // Clear fields
+    document.getElementById('add_item_name').value = '';
     document.getElementById('add_description').value = '';
     document.getElementById('add_unit').value = '';
     document.getElementById('add_reorder_point').value = '';
@@ -224,6 +231,7 @@ function openEditModal(button) {
     
     document.getElementById('edit_item_id').value = itemId;
     document.getElementById('edit_stock_number').value = button.dataset.stock_number;
+    document.getElementById('edit_item_name').value = button.dataset.item_name;
     document.getElementById('edit_description').value = button.dataset.description;
     document.getElementById('edit_unit').value = button.dataset.unit;
     document.getElementById('edit_reorder_point').value = button.dataset.reorder_point;
@@ -321,6 +329,7 @@ function addRowToTable(item) {
     newRow.setAttribute('data-id', item.item_id);
     newRow.innerHTML = `
         <td><strong>${item.stock_number}</strong></td>
+        <td>${item.item_name}</td>
         <td>${item.description}</td>
         <td>${item.unit}</td>
         <td class="quantity-cell">
@@ -341,6 +350,7 @@ function addRowToTable(item) {
             <button class='btn edit-btn' onclick='openEditModal(this)'
                 data-id='${item.item_id}'
                 data-stock_number='${item.stock_number}'
+                data-item_name='${item.item_name}'
                 data-description='${item.description}'
                 data-unit='${item.unit}'
                 data-reorder_point='${item.reorder_point}'
@@ -364,6 +374,7 @@ function updateRowInTable(item) {
         
         row.innerHTML = `
             <td><strong>${item.stock_number}</strong></td>
+            <td>${item.item_name}</td>
             <td>${item.description}</td>
             <td>${item.unit}</td>
             <td class="quantity-cell">
@@ -384,6 +395,7 @@ function updateRowInTable(item) {
                 <button class='btn edit-btn' onclick='openEditModal(this)'
                     data-id='${item.item_id}'
                     data-stock_number='${item.stock_number}'
+                    data-item_name='${item.item_name}'
                     data-description='${item.description}'
                     data-unit='${item.unit}'
                     data-reorder_point='${item.reorder_point}'

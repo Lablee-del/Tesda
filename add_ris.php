@@ -273,7 +273,7 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
             
             <!-- Search Container -->
             <div class="search-container">
-                <input type="text" id="itemSearch" class="search-input" placeholder="Search by Stock No., Description, or Unit..." onkeyup="filterItems()">
+                <input type="text" id="itemSearch" class="search-input" placeholder="Search by Stock No., Item, Description, or Unit..." onkeyup="filterItems()">
             </div>
             
             <div style="overflow-x:auto;">
@@ -281,6 +281,7 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
                     <thead>
                         <tr>
                             <th>Stock No.</th>
+                            <th>Item</th>
                             <th>Description</th>
                             <th>Unit</th>
                             <th>Quantity on Hand</th>
@@ -297,8 +298,9 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
                                 $stock_number = $row['stock_number'];
                                 $existing_item = $ris_items[$stock_number] ?? null;
                                 
-                                echo '<tr class="item-row" data-stock="' . htmlspecialchars(strtolower($stock_number)) . '" data-description="' . htmlspecialchars(strtolower($row['description'])) . '" data-unit="' . htmlspecialchars(strtolower($row['unit'])) . '">';
+                                echo '<tr class="item-row" data-stock="' . htmlspecialchars(strtolower($stock_number)) . '"data-item_name="' . htmlspecialchars(strtolower($row['item_name'])) . '" data-description="' . htmlspecialchars(strtolower($row['description'])) . '" data-unit="' . htmlspecialchars(strtolower($row['unit'])) . '">';
                                 echo '<td><input type="hidden" name="stock_number[]" value="' . htmlspecialchars($stock_number) . '">' . htmlspecialchars($stock_number) . '</td>';
+                                echo '<td>' . htmlspecialchars($row['item_name']) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['description']) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['unit']) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['quantity_on_hand']) . '</td>';
@@ -358,13 +360,15 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
         
         // Loop through each row
         itemRows.forEach(function(row) {
-            // Get the data attributes (stock number, description, unit)
+            // Get the data attributes (stock number,item_name, description, unit)
             const stockNumber = row.getAttribute('data-stock');
+            const item_name = row.getAttribute('data-item_name');
             const description = row.getAttribute('data-description');
             const unit = row.getAttribute('data-unit');
             
             // Check if search value matches any of the fields
             if (stockNumber.includes(searchValue) || 
+                item_name.includes(searchValue) ||
                 description.includes(searchValue) || 
                 unit.includes(searchValue)) {
                 // Show the row

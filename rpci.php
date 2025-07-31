@@ -4,7 +4,7 @@ include 'sidebar.php';
 
 // Fetch inventory items from database
 $inventory_items = [];
-$sql = "SELECT description, stock_number FROM items ORDER BY description";
+$sql = "SELECT item_name, description, stock_number FROM items ORDER BY item_name";
 $result = $conn->query($sql);
 
 if ($result) {
@@ -67,6 +67,7 @@ if ($result) {
                     <thead>
                         <tr>
                             <th rowspan="2">Article</th>
+                            <th rowspan="2">Item</th>
                             <th rowspan="2">Description</th>
                             <th rowspan="2">Stock Number</th>
                             <th rowspan="2">Unit of Measure</th>
@@ -90,6 +91,8 @@ if ($result) {
                                 echo '<tr>';
                                 // Article column with default value "Office Supplies"
                                 echo '<td>Office Supplies</td>';
+                                //Item Name
+                                echo '<td>' . htmlspecialchars($item['item_name'] ?? '') . '</td>';
                                 // Description from database
                                 echo '<td>' . htmlspecialchars($item['description'] ?? '') . '</td>';
                                 // Stock Number from database

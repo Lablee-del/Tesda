@@ -71,7 +71,7 @@
 
         <div class="ris-actions">
             <a href="SC.php" class="btn btn-secondary">← Back to SC List</a>
-            <a class="btn btn-primary">📄 Export PDF</a>
+            <a href="sc_export.php?item_id=<?php echo $item_id; ?>" class="btn btn-primary">📄 Export PDF</a>
 
             <form method="POST" 
                 action="" 
@@ -100,6 +100,7 @@
                             <tr>
                                 <th>Date</th>
                                 <th>Stock No.</th>
+                                <th>Item</th>
                                 <th>Description</th>
                                 <th>Unit</th>
                                 <th>Reorder Point</th>
@@ -114,6 +115,7 @@
                                 <tr>
                                     <td><?= date('M d, Y H:i', strtotime($h['changed_at'])) ?></td>
                                     <td><?= htmlspecialchars($h['stock_number']) ?></td>
+                                    <td><?= htmlspecialchars($h['item_name']) ?></td>
                                     <td><?= htmlspecialchars($h['description']) ?></td>
                                     <td><?= htmlspecialchars($h['unit']) ?></td>
                                     <td><?= htmlspecialchars($h['reorder_point']) ?></td>

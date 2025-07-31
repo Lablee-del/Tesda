@@ -6,7 +6,7 @@ if (isset($_GET['action'])) {
     header('Content-Type: application/json');
 
 
-// save history (test)
+// save history 
     function logItemHistory($conn, $item_id, $change_type = 'update') {
     // Fetch current item info
     $stmt = $conn->prepare("SELECT * FROM items WHERE item_id = ?");
@@ -35,27 +35,39 @@ if (isset($_GET['action'])) {
     };
 
     // Insert into history
-    $insert = $conn->prepare("
-        INSERT INTO item_history (
-            item_id, stock_number, description, unit, reorder_point,
-            unit_cost, quantity_on_hand, quantity_change, change_direction, change_type
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-    $insert->bind_param(
-        "isssidiiis",
-        $item_id,
-        $item['stock_number'],
-        $item['description'],
-        $item['unit'],
-        $item['reorder_point'],
-        $item['unit_cost'],
-        $current_quantity,
-        $quantity_change,
-        $change_direction,
-        $change_type
-    );
-    $insert->execute();
-    $insert->close();
+$insert = $conn->prepare("
+    INSERT INTO item_history (
+        item_id,
+        stock_number,
+        item_name,
+        description,
+        unit,
+        reorder_point,
+        unit_cost,
+        quantity_on_hand,
+        quantity_change,
+        change_direction,
+        change_type
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+");
+
+$insert->bind_param(
+    "issssdiisss",
+    $item_id,
+    $item['stock_number'],
+    $item['item_name'],
+    $item['description'],
+    $item['unit'],
+    $item['reorder_point'],
+    $item['unit_cost'],
+    $current_quantity,
+    $quantity_change,
+    $change_direction,
+    $change_type
+);
+
+$insert->execute();
+$insert->close();
 }
     
     switch ($_GET['action']) {
@@ -72,6 +84,7 @@ if (isset($_GET['action'])) {
                     echo json_encode([
                         'exists' => true,
                         'item' => [
+                            'item_name' => $row['item_name'],
                             'description' => $row['description'],
                             'unit' => $row['unit'],
                             'reorder_point' => $row['reorder_point'],
@@ -104,6 +117,7 @@ if (isset($_GET['action'])) {
             if (isset($_POST['stock_number'])) {
                 
                 $stock_number = $_POST['stock_number'];
+                $item_name = $_POST['item_name'];
                 $description = $_POST['description'];
                 $unit = $_POST['unit'];
                 $reorder_point = intval($_POST['reorder_point']);
@@ -154,8 +168,8 @@ if (isset($_GET['action'])) {
                     $entry_stmt->close();
                 } else {
                     // Insert new item
-                    $stmt = $conn->prepare("INSERT INTO items (stock_number, description, unit, reorder_point, unit_cost, quantity_on_hand, initial_quantity) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->bind_param("sssiidi", $stock_number, $description, $unit, $reorder_point, $unit_cost, $quantity_on_hand, $quantity_on_hand);
+                    $stmt = $conn->prepare("INSERT INTO items (stock_number, item_name, description, unit, reorder_point, unit_cost, quantity_on_hand, initial_quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt->bind_param("ssssiidi", $stock_number, $item_name, $description, $unit, $reorder_point, $unit_cost, $quantity_on_hand, $quantity_on_hand);
                     
                     if ($stmt->execute()) {
                         $new_id = $conn->insert_id;
@@ -168,6 +182,7 @@ if (isset($_GET['action'])) {
                             'item' => [
                             'item_id' => $new_id,
                             'stock_number' => $stock_number,
+                            'item_name' => $item_name,
                             'description' => $description,
                             'unit' => $unit,
                             'reorder_point' => $reorder_point,
@@ -206,6 +221,7 @@ if (isset($_GET['action'])) {
                 $check_entries_stmt->close();
                 
                 $stock_number = $_POST['stock_number'];
+                $item_name = $_POST['item_name'];
                 $description = $_POST['description'];
                 $unit = $_POST['unit'];
                 $reorder_point = intval($_POST['reorder_point']);
@@ -214,15 +230,15 @@ if (isset($_GET['action'])) {
                     // Only update basic fields, not unit_cost and quantity_on_hand
                     $stmt = $conn->prepare("UPDATE items SET 
                                 stock_number = ?,
+                                item_name = ?,
                                 description = ?,
                                 unit = ?,
                                 reorder_point = ?
                             WHERE item_id = ?");
-                    $stmt->bind_param("sssii", $stock_number, $description, $unit, $reorder_point, $id);
+                    $stmt->bind_param("ssssii", $stock_number, $item_name, $description, $unit, $reorder_point, $id);
                     
                     if ($stmt->execute()) {
-                    // Log history
-                    logItemHistory($conn, $id);
+
                     // Check if this item doesn't have an initial_quantity set yet
                     $check_initial_stmt = $conn->prepare("SELECT initial_quantity FROM items WHERE item_id = ?");
                     $check_initial_stmt->bind_param("i", $id);
@@ -258,6 +274,7 @@ if (isset($_GET['action'])) {
                         'item' => [
                             'item_id' => $id,
                             'stock_number' => $stock_number,
+                            'item_name' => $item_name,
                             'description' => $description,
                             'unit' => $unit,
                             'reorder_point' => $reorder_point,
@@ -276,13 +293,14 @@ if (isset($_GET['action'])) {
                     
                     $stmt = $conn->prepare("UPDATE items SET 
                                 stock_number = ?,
+                                item_name = ?,
                                 description = ?,
                                 unit = ?,
                                 reorder_point = ?,
                                 unit_cost = ?,
                                 quantity_on_hand = ?
                             WHERE item_id = ?");
-                    $stmt->bind_param("sssiidi", $stock_number, $description, $unit, $reorder_point, $unit_cost, $quantity_on_hand, $id);
+                    $stmt->bind_param("ssssiidi", $stock_number, $item_name, $description, $unit, $reorder_point, $unit_cost, $quantity_on_hand, $id);
 
                     if ($stmt->execute()) {
                         // Check if this item doesn't have an initial_quantity set yet
@@ -309,6 +327,7 @@ if (isset($_GET['action'])) {
                             'item' => [
                                 'item_id' => $id,
                                 'stock_number' => $stock_number,
+                                'item_name' => $item_name,
                                 'description' => $description,
                                 'unit' => $unit,
                                 'reorder_point' => $reorder_point,
@@ -425,6 +444,7 @@ if (isset($_GET['action'])) {
             <thead>
                 <tr>
                     <th><i class=""></i> Stock Number</th>
+                    <th><i class=""></i> Item</th>
                     <th><i class=""></i> Description</th>
                     <th><i class=""></i> Unit</th>
                     <th><i class=""></i> Quantity</th>
@@ -465,6 +485,7 @@ if (isset($_GET['action'])) {
                         
                         echo "<tr data-id='{$row['item_id']}'>
                             <td><strong>{$row['stock_number']}</strong></td>
+                            <td>{$row['item_name']}</strong></td>
                             <td>{$row['description']}</td>
                             <td>{$row['unit']}</td>
                             <td class='quantity-cell'>
@@ -492,6 +513,7 @@ if (isset($_GET['action'])) {
                                     onclick='openEditModal(this)'
                                     data-id='{$row['item_id']}'
                                     data-stock_number='{$row['stock_number']}'
+                                    data-item_name= '{$row['item_name']}'
                                     data-description='{$row['description']}'
                                     data-unit='{$row['unit']}'
                                     data-reorder_point='{$row['reorder_point']}'
@@ -584,6 +606,9 @@ if (isset($_GET['action'])) {
             <input type="text" name="stock_number" id="add_stock_number" placeholder="Enter stock number" required>
             <div id="stock_status" class="stock-status"></div>
 
+            <label for="add_item_name">Item Name</label>
+            <input type="text" name="item_name" id="add_item_name" placeholder="Name" required readonly>
+
             <label for="add_description">Description</label>
             <input type="text" name="description" id="add_description" placeholder="Description" required readonly>
 
@@ -617,8 +642,11 @@ if (isset($_GET['action'])) {
             <label for="edit_stock_number">Stock Number</label>
             <input type="text" name="stock_number" id="edit_stock_number" placeholder="e.g. 1001" required>
 
+            <label for="edit_item_name">Item Name</label>
+            <input type="text" name="item_name" id="edit_item_name" placeholder="e.g Hammer" required>
+
             <label for="edit_description">Description</label>
-            <input type="text" name="description" id="edit_description" placeholder="e.g. Hammer" required>
+            <input type="text" name="description" id="edit_description" placeholder="e.g. Red" required>
 
             <label for="edit_unit">Unit</label>
             <input type="text" name="unit" id="edit_unit" placeholder="pcs, box, etc." required>

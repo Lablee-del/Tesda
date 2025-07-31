@@ -34,6 +34,7 @@
     $item_query = "
         SELECT 
             i.stock_number,
+            i.item_name,
             i.description,
             i.unit,
             i.quantity_on_hand,
@@ -75,6 +76,7 @@
                 <thead>
                     <tr>
                         <th>Stock No.</th>
+                        <th>Item</th>
                         <th>Description</th>
                         <th>Unit</th>
                         <th>Quantity on Hand</th>
@@ -92,6 +94,7 @@
                             
                             echo '<tr ' . $row_class . '>';
                             echo '<td>' . htmlspecialchars($item['stock_number']) . '</td>';
+                            echo '<td>' . htmlspecialchars($item['item_name']) . '</td>';
                             echo '<td>' . htmlspecialchars($item['description']) . '</td>';
                             echo '<td>' . htmlspecialchars($item['unit']) . '</td>';
                             echo '<td>' . htmlspecialchars($item['quantity_on_hand']) . '</td>';

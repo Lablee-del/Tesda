@@ -29,7 +29,7 @@
                 require 'config.php';
 
                 $result = $conn->query("
-                    SELECT ris.ris_no, ri.stock_number, i.description, i.unit, ri.issued_quantity, 
+                    SELECT ris.ris_no, ri.stock_number, i.item_name, i.description, i.unit, ri.issued_quantity, 
                         ri.unit_cost_at_issue AS unit_cost,
                         (ri.issued_quantity * ri.unit_cost_at_issue) AS amount
                     FROM ris_items ri
@@ -44,7 +44,7 @@
                         echo '<tr>';
                         echo '<td>' . htmlspecialchars($row['ris_no']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['stock_number']) . '</td>';
-                        echo '<td>' . htmlspecialchars($row['description']) . '</td>';
+                        echo '<td>' . htmlspecialchars($row['item_name']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['unit']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['issued_quantity']) . '</td>';
                         echo '<td class="currency">₱ ' . number_format($row['unit_cost'], 2) . '</td>';
