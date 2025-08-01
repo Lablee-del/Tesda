@@ -161,6 +161,10 @@ INSERT INTO `items` (`item_id`, `stock_number`, `description`, `unit`, `reorder_
 
 -- Altered Item database ------------------------------
 
+ALTER TABLE items
+  ADD COLUMN item_name VARCHAR(255) DEFAULT NULL AFTER description,
+  ADD COLUMN item_description TEXT DEFAULT NULL AFTER item_name;
+
 SELECT 
     item_id,
     description,
@@ -185,6 +189,12 @@ SET
       ELSE ''
     END
   );
+
+  ALTER TABLE items
+  DROP COLUMN description;
+
+ALTER Table items
+CHANGE item_description description Text;
 
 
 
