@@ -42,7 +42,7 @@
 
         rows.forEach(row => {
             const stockNo = row.cells[0].textContent.toLowerCase();
-            const stockNO = row.cells[1].textContent.toLowerCase(); 
+            const item_name = row.cells[1].textContent.toLowerCase(); 
             const description = row.cells[2].textContent.toLowerCase();
             const unit = row.cells[3].textContent.toLowerCase();
 
