@@ -3,7 +3,7 @@ require 'config.php';
 
 // Get all RSMI data
 $rsmi_query = "
-    SELECT ris.ris_no, ri.stock_number, i.description, i.unit, ri.issued_quantity, 
+    SELECT ris.ris_no, ri.stock_number, i.item_name, i.description, i.unit, ri.issued_quantity, 
         ri.unit_cost_at_issue AS unit_cost,
         (ri.issued_quantity * ri.unit_cost_at_issue) AS amount,
         ris.date_requested, ris.entity_name, ris.fund_cluster, ris.division, 
@@ -383,7 +383,7 @@ if ($rsmi_result && $rsmi_result->num_rows > 0) {
                         echo '<td>' . htmlspecialchars($row['ris_no']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['responsibility_center_code']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['stock_number']) . '</td>';
-                        echo '<td class="text-left">' . htmlspecialchars($row['description']) . '</td>';
+                        echo '<td class="text-left">' . htmlspecialchars($row['item_name']) . '-' . htmlspecialchars($row['description']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['unit']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['issued_quantity']) . '</td>';
                         echo '<td class="text-right">₱ ' . number_format($row['unit_cost'], 2) . '</td>';
