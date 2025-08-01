@@ -381,3 +381,6 @@ CREATE TABLE item_history (
 ALTER TABLE item_history ADD COLUMN quantity_change INT AFTER quantity_on_hand;
 
 ALTER TABLE item_history ADD COLUMN change_direction VARCHAR(20) AFTER quantity_change;
+
+ALTER TABLE item_history
+ADD COLUMN item_name VARCHAR(255) AFTER stock_number;
