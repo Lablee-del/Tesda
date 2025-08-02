@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bind_param("iid", $item_id, $negative_qty, $zero_cost);
                 $stmt->execute();
                 $stmt->close();
-                logItemIssueHistory($conn, $item_id, $issued_qty, 'issued', $ris_id);
+                logItemHistory($conn, $item_id, $issued_qty, 'issued', $ris_no);
             }
 
             // Recalculate average cost (this happens AFTER we've saved the original cost)

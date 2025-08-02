@@ -3,20 +3,29 @@
     
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_history']) && isset($_POST['item_id'])) {
         $item_id_to_clear = (int)$_POST['item_id'];
-        $stmt = $conn->prepare("DELETE FROM item_history WHERE item_id = ?");
-        $stmt->bind_param("i", $item_id_to_clear);
+        $conn->query("INSERT INTO item_history_archive SELECT * FROM item_history WHERE item_id = $item_id_to_clear");
+        $conn->query("DELETE FROM item_history WHERE item_id = $item_id_to_clear");
 
-        if ($stmt->execute()) {
+        if ($conn->affected_rows > 0) {
             header("Location: view_sc.php?item_id=" . $item_id_to_clear . "&cleared=1");
             exit;
         } else {
             echo "<script>alert('❌ Failed to clear history');</script>";
         }
-        $stmt->close();
     }
 
-    if (isset($_GET['cleared']) && $_GET['cleared'] == 1) {
-        echo "<script>alert('✅ History cleared successfully');</script>";
+        if (isset($_GET['cleared']) && $_GET['cleared'] == 1) {
+            echo "<script>alert('✅ History cleared successfully');</script>";
+        }
+
+        if (isset($_GET['undo']) && isset($_GET['item_id'])) {
+        $item_id_to_restore = (int)$_GET['item_id'];
+
+        // Move history back from archive
+        $conn->query("INSERT INTO item_history SELECT * FROM item_history_archive WHERE item_id = $item_id_to_restore");
+        $conn->query("DELETE FROM item_history_archive WHERE item_id = $item_id_to_restore");
+
+        echo "<script>alert('✅ History restored successfully');</script>";
     }
 ?>
 
@@ -41,6 +50,14 @@
         $item_id = (int)$_GET['item_id'];
         if ($item_id <= 0) {
             die("❌ Invalid item ID.");
+        }
+
+        if (isset($_GET['cleared']) && $_GET['cleared'] == 1) {
+            echo "<script>
+                if (confirm('✅ History cleared successfully. Undo?')) {
+                    window.location.href = 'view_sc.php?item_id=" . $item_id . "&undo=1';
+                }
+            </script>";
         }
 
         $result = $conn->query("SELECT * FROM items WHERE item_id = $item_id");
@@ -79,7 +96,14 @@
                 style="display:inline;">
                 <input type="hidden" name="clear_history" value="1">
                 <input type="hidden" name="item_id" value="<?= $item_id ?>">
-                <button type="submit" class="btn btn-danger">🗑️ Clear History</button>
+                <?php if (!empty($history_rows)): ?>
+                    <button id="clearHistoryBtn" 
+                            class="btn btn-danger"
+                            data-item-id="<?= $item_id ?>">
+                        🗑️ Clear History
+                    </button>
+                    
+                <?php endif; ?>
             </form>
         </div>
 

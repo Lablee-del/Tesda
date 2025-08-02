@@ -161,6 +161,11 @@ INSERT INTO `items` (`item_id`, `stock_number`, `description`, `unit`, `reorder_
 
 -- Altered Item database ------------------------------
 
+ALTER TABLE items
+  ADD COLUMN item_name VARCHAR(255) DEFAULT NULL AFTER description,
+  ADD COLUMN item_description TEXT DEFAULT NULL AFTER item_name;
+
+
 SELECT 
     item_id,
     description,
@@ -185,6 +190,12 @@ SET
       ELSE ''
     END
   );
+
+  ALTER TABLE items
+  DROP COLUMN description;
+
+ALTER Table items
+CHANGE item_description description Text;
 
 
 
@@ -371,3 +382,17 @@ CREATE TABLE item_history (
 ALTER TABLE item_history ADD COLUMN quantity_change INT AFTER quantity_on_hand;
 
 ALTER TABLE item_history ADD COLUMN change_direction VARCHAR(20) AFTER quantity_change;
+
+ALTER TABLE item_history
+ADD COLUMN item_name VARCHAR(255) AFTER stock_number;
+
+Alter TABLE item_history
+  Add COLUMN reference_id VARCHAR (255); 
+
+ALTER TABLE item_history 
+MODIFY COLUMN reference_id VARCHAR(255) NULL 
+AFTER change_type;
+
+<!-- cleared history-->
+
+CREATE TABLE item_history_archive LIKE item_history;

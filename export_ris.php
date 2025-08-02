@@ -18,6 +18,7 @@ $ris = $ris_result->fetch_assoc();
 $item_query = "
     SELECT 
         i.stock_number,
+        i.item_name,
         i.description,
         i.unit,
         ri.issued_quantity,

@@ -386,5 +386,13 @@ ALTER TABLE item_history ADD COLUMN change_direction VARCHAR(20) AFTER quantity_
 ALTER TABLE item_history
 ADD COLUMN item_name VARCHAR(255) AFTER stock_number;
 
-ALTER TABLE items
-  DROP COLUMN reference_id;
+Alter TABLE item_history
+  Add COLUMN reference_id VARCHAR (255); 
+
+ALTER TABLE item_history 
+MODIFY COLUMN reference_id VARCHAR(255) NULL 
+AFTER change_type;
+
+<!-- cleared history-->
+
+CREATE TABLE item_history_archive LIKE item_history;
