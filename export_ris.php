@@ -288,7 +288,6 @@ $item_result = $conn->query($item_query);
                         
                         echo '<tr>';
                         echo '<td>' . htmlspecialchars($item['stock_number']) . '</td>';
-                        // edited 
                         echo '<td class="description">' . htmlspecialchars($item['item_name']) . ',' . htmlspecialchars($item['description']) . '</td>';
                         echo '<td>' . htmlspecialchars($item['unit']) . '</td>';
                         echo '<td>' . htmlspecialchars($item['issued_quantity']) . '</td>';

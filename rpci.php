@@ -63,7 +63,21 @@ if ($result) {
                     </div>
                 </div>
 
-                <table class="rpci-table">
+                <div class="table-controls" style="margin: 12px 0; display:flex; gap:8px; align-items:center;">
+                    <label for="row_limit">Show:</label>
+                    <select id="row_limit" aria-label="Rows to display">
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="all">All</option>
+                    </select>
+                    <div class="search-container-sc">
+                                <input type="text" id="searchInput" class="search-input-sc" placeholder="Search by stock number, item, or unit...">
+                    </div>
+                </div>
+
+            <div class="rpci-table-wrapper">
+                <table class="rpci-table" id="rpci-table">
                     <thead>
                         <tr>
                             <th rowspan="2">Article</th>
@@ -82,6 +96,7 @@ if ($result) {
                             <th>Value</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         <?php
                         if (empty($inventory_items)) {
@@ -111,6 +126,7 @@ if ($result) {
                         ?>
                     </tbody>
                 </table>
+                </div>
                 
                 <div class="signature-section">
                     <div class="signature-box">
@@ -155,5 +171,64 @@ if ($result) {
             alert('Export to PDF functionality will be implemented');
         }
     </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const limitSelect = document.getElementById('row_limit');
+        const wrapper = document.querySelector('.rpci-table-wrapper');
+        const table = document.querySelector('.rpci-table');
+        const thead = table.querySelector('thead');
+
+        function applyLimit() {
+            const val = limitSelect.value;
+            const sampleRow = table.querySelector('tbody tr:not([style*="display: none"])');
+            if (!wrapper || !thead || !sampleRow) return;
+
+            const headerHeight = thead.getBoundingClientRect().height;
+            const rowHeight = sampleRow.getBoundingClientRect().height;
+
+            if (val === 'all') {
+                wrapper.style.maxHeight = 'none';
+            } else {
+                const count = parseInt(val, 10);
+                wrapper.style.maxHeight = `${headerHeight + rowHeight * count}px`;
+            }
+        }
+
+        limitSelect.addEventListener('change', applyLimit);
+        applyLimit();
+
+        window.addEventListener('resize', applyLimit);
+    });
+
+    // Searchbar JS
+        document.getElementById('searchInput').addEventListener('keyup', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#rpci-table tbody tr');
+
+        rows.forEach(row => {
+            const stockNo = row.cells[0].textContent.toLowerCase();
+            const item_name = row.cells[1].textContent.toLowerCase(); 
+            const description = row.cells[2].textContent.toLowerCase();
+            const unit = row.cells[3].textContent.toLowerCase();
+
+            const match = stockNo.includes(filter) || item_name.includes(filter) || description.includes(filter) || unit.includes(filter);
+            row.style.display = match ? '' : 'none';
+        });
+    });
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const firstRow = document.querySelector('.rpci-table thead tr:first-child');
+        const secondRowThs = document.querySelectorAll('.rpci-table thead tr:nth-child(2) th');
+        if (!firstRow || secondRowThs.length === 0) return;
+        const firstRowHeight = firstRow.getBoundingClientRect().height;
+        secondRowThs.forEach(th => {
+            th.style.top = firstRowHeight + 'px';
+        });
+    });
+    </script>
+
 </body>
 </html>
