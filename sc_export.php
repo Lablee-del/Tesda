@@ -234,7 +234,7 @@ $ris = ['entity_name' => 'TESDA'];
           ?>
             <tr>
               <td><?php echo $date; ?></td>
-              <td><?php echo $reference; ?></td>
+              <td><?php echo $reference_id; ?></td>
               <td><?php echo $receipt_qty; ?></td>
               <td><?php echo $issue_qty; ?></td>
               <td><?php echo $office; ?></td>

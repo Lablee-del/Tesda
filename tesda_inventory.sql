@@ -165,6 +165,7 @@ ALTER TABLE items
   ADD COLUMN item_name VARCHAR(255) DEFAULT NULL AFTER description,
   ADD COLUMN item_description TEXT DEFAULT NULL AFTER item_name;
 
+
 SELECT 
     item_id,
     description,
@@ -384,3 +385,6 @@ ALTER TABLE item_history ADD COLUMN change_direction VARCHAR(20) AFTER quantity_
 
 ALTER TABLE item_history
 ADD COLUMN item_name VARCHAR(255) AFTER stock_number;
+
+ALTER TABLE items
+  DROP COLUMN reference_id;
