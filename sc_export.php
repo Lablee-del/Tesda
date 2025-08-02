@@ -86,23 +86,24 @@ $ris = ['entity_name' => 'TESDA'];
         padding: 3px 6px;
         vertical-align: bottom;
     }
-
+    
     .meta-label {
-        font-weight: bold;
-        white-space: nowrap;
+      font-weight: bold;
+      white-space: nowrap;
+      display: inline-block;
+      vertical-align: bottom;
+      margin-right: 4px;
     }
 
     .field-line {
-        display: inline-block;
-        border-bottom: 1px solid #000;
-        width: 100%;
-        min-height: 16px;
-        line-height: 16px;
-        padding: 0 2px;
-        box-sizing: border-box;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-        word-break: break-word;
+      display: inline-block;
+      border-bottom: 1px solid #000;
+      min-width: 100px;
+      min-height: 16px;
+      line-height: 16px;
+      padding: 0 2px;
+      box-sizing: border-box;
+      vertical-align: bottom;
     }
     .stock-card-table {
       width: 100%;

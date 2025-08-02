@@ -27,6 +27,7 @@
                 <th><i class=""></i> Item</th>
                 <th><i class=""></i> Description</th>
                 <th><i class=""></i> Unit of Measurement</th>
+                <th><i class=""></i> Quantity</th>
                 <th><i class=""></i> Reorder Point</th>
                 <th><i class=""></i> Actions</th>
             </tr>
@@ -65,6 +66,7 @@
                             <td>{$row['item_name']}</td>
                             <td>{$row['description']}</td>
                             <td>{$row['unit']}</td>
+                            <td>{$row['quantity_on_hand']}</td>
                             <td>{$row['reorder_point']}</td>
                             <td>
                                 <a href='view_sc.php?item_id={$row['item_id']}' title='View SC'>
