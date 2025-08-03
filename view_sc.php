@@ -88,7 +88,10 @@
 
         <div class="ris-actions">
             <a href="SC.php" class="btn btn-secondary">← Back to SC List</a>
-            <a href="sc_export.php?item_id=<?php echo $item_id; ?>" class="btn btn-primary">📄 Export PDF</a>
+            <form action="sc_export.php" method="get" style="display:inline;">
+                <input type="hidden" name="item_id" value="<?php echo $item_id; ?>">
+                <button type="submit" class="btn btn-primary">📄 Export PDF</button>
+            </form>
 
             <form method="POST" 
                 action="" 

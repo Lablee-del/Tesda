@@ -80,36 +80,47 @@ $ris = ['entity_name' => 'TESDA'];
       margin: 4px 0 8px;
       letter-spacing: 1px;
     }
-    .meta-table {
+
+  .meta-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 6px;
     font-size: 12px;
-    }
+  }
 
-    .meta-table td {
-        padding: 3px 6px;
-        vertical-align: bottom;
-    }
-    
-    .meta-label {
-      font-weight: bold;
-      white-space: nowrap;
-      display: inline-block;
-      vertical-align: bottom;
-      margin-right: 4px;
-    }
+  .meta-table td {
+    padding: 3px 6px;
+    vertical-align: bottom;
+  }
 
-    .field-line {
-      display: inline-block;
-      border-bottom: 1px solid #000;
-      min-width: 100px;
-      min-height: 16px;
-      line-height: 16px;
-      padding: 0 2px;
-      box-sizing: border-box;
-      vertical-align: bottom;
-    }
+  .meta-item {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+    flex-wrap: nowrap;
+  }
+
+  .meta-label {
+    font-weight: bold;
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+
+  .field-line {
+    flex: 1 1 180px; /* grow to fill, but at least 180px */
+    border-bottom: 1px solid #000;
+    min-height: 16px;
+    line-height: 16px;
+    padding: 0 4px;
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: bottom;
+    /* ensure empty placeholder shows underline */
+  }
+
+  .field-line.empty:after {
+    content: "\00a0"; /* non-breaking space to preserve height when empty */
+  }
     .stock-card-table {
       width: 100%;
       border-collapse: collapse;
@@ -189,27 +200,62 @@ $ris = ['entity_name' => 'TESDA'];
     <div class="appendix">Appendix 53</div>
     <div class="title">STOCK CARD</div>
 
-    <table class="meta-table">
-      <tr>
-        <td style="width:33%;"><span class="meta-label">LGU:</span> <span class="field-line"><?php echo htmlspecialchars($ris['entity_name']); ?></span></td>
-        <td style="width:33%;"><span class="meta-label">Fund:</span> <span class="field-line">______________</span></td>
-        <td style="width:34%;"></td>
-      </tr>
-      <tr>
-        <td><span class="meta-label">Item:</span> <span class="field-line"><?php echo htmlspecialchars($items['item_name']); ?></span></td>
-        <td><span class="meta-label">Stock No.:</span> <span class="field-line"><?php echo htmlspecialchars($items['stock_number']); ?></span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="meta-label">Description:</span> <span class="field-line"><?php echo htmlspecialchars($items['description']); ?></span></td>
-        <td><span class="meta-label">Re-order Point:</span> <span class="field-line"><?php echo htmlspecialchars($items['reorder_point']); ?></span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="meta-label">Unit of Measurement:</span> <span class="field-line"><?php echo htmlspecialchars($items['unit']); ?></span></td>
-        <td colspan="2"></td>
-      </tr>
-    </table>
+  <table class="meta-table">
+    <tr>
+      <td style="width:33%;">
+        <div class="meta-item">
+          <span class="meta-label">LGU:</span>
+          <div class="field-line"><?php echo htmlspecialchars($ris['entity_name']); ?></div>
+        </div>
+      </td>
+      <td style="width:33%;">
+        <div class="meta-item">
+          <span class="meta-label">Fund:</span>
+          <div class="field-line empty"></div>
+        </div>
+      </td>
+      <td style="width:34%;"></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="meta-item">
+          <span class="meta-label">Item:</span>
+          <div class="field-line"><?php echo htmlspecialchars($items['item_name']); ?></div>
+        </div>
+      </td>
+      <td>
+        <div class="meta-item">
+          <span class="meta-label">Stock No.:</span>
+          <div class="field-line"><?php echo htmlspecialchars($items['stock_number']); ?></div>
+        </div>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="meta-item">
+          <span class="meta-label">Description:</span>
+          <div class="field-line"><?php echo htmlspecialchars($items['description']); ?></div>
+        </div>
+      </td>
+      <td>
+        <div class="meta-item">
+          <span class="meta-label">Re-order Point:</span>
+          <div class="field-line"><?php echo htmlspecialchars($items['reorder_point']); ?></div>
+        </div>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="meta-item">
+          <span class="meta-label">Unit of Measurement:</span>
+          <div class="field-line"><?php echo htmlspecialchars($items['unit']); ?></div>
+        </div>
+      </td>
+      <td colspan="2"></td>
+    </tr>
+  </table>
 
     <table class="stock-card-table">
       <thead>

@@ -157,19 +157,24 @@ if ($result) {
                 </div>
                 
                 <div style="text-align: center; margin-top: 30px;">
-                    <button type="button" class="export-btn" onclick="exportToPDF()">
-                        📄 Export to PDF
-                    </button>
+                    <button type="button" class="export-btn" onclick="openExport()">📄 Export to PDF</button>
                 </div>
             </form>
         </div>
     </div>
     
     <script>
-        function exportToPDF() {
-            // PDF export functionality will be implemented later
-            alert('Export to PDF functionality will be implemented');
-        }
+    function openExport() {
+        const params = new URLSearchParams({
+            report_date: document.getElementById('report_date').value,
+            fund_cluster: document.getElementById('fund_cluster').value,
+            accountable_officer: document.getElementById('accountable_officer').value,
+            official_designation: document.getElementById('official_designation').value,
+            entity_name: document.getElementById('entity_name').value,
+            assumption_date: document.getElementById('assumption_date').value,
+        });
+        window.open('./rpci_export.php?' + params.toString(), '_blank');
+    }
     </script>
 
     <script>
