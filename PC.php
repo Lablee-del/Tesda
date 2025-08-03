@@ -101,14 +101,6 @@
     <div class="content">
         <h2>Property Card (PC) </h2>
 
-        <!-- Info Section -->
-        <div class="info-section">
-            <h4>About Property Card (PC)</h4>
-            <p><strong>Purpose:</strong> The PC shall be maintained for each class of Property, Plant and Equipment (PPE) and semi-expendable supplies.</p>
-            <p><strong>Maintained by:</strong> Supply and/or Property Division/Unit, organized by fund cluster.</p>
-            <p><strong>Records:</strong> Acquisition, issue/transfer/disposal, and asset information based on IAR and supporting documents.</p>
-        </div>
-
         <!-- Export and Action Section -->
         <div class="export-section">
             <h4>Actions</h4>
