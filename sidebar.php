@@ -43,7 +43,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                             🧰 Semi Expendables
                         </button>
                         <div class="dropdown-menu">
-                            <a href="pc.php" class="<?= $currentPage == 'pc.php' ? 'active' : '' ?>">🖥️ PC</a>
+                            <a href="PC.php" class="<?= $currentPage == 'pc.php' ? 'active' : '' ?>">🖥️ PC</a>
                             <a href="ics.php" class="<?= $currentPage == 'ics.php' ? 'active' : '' ?>">📦 ICS</a>
                         </div>
                     </div>
