@@ -562,7 +562,19 @@ tbody tr:hover {
     background: var(--blue-gradient);
     border-radius: 2px;
 }
+.item-row.hidden {
+    display: none;
+}
 
+.item-row.visible {
+    display: table-row;
+}
+.no-search-placeholder {
+    display: table-row;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
 /* RIS Action Links */
 .content td a {
     color: var(--primary-blue);

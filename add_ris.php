@@ -274,8 +274,7 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
             
             <!-- Search Container -->
             <div class="search-container">
-                <input type="text" id="itemSearch" class="search-input" placeholder="Search by Stock No., Item, Description, or Unit..." onkeyup="filterItems()">
-            </div>
+                <input type="text" id="itemSearch" class="search-input" placeholder="Start typing to search items..." onkeyup="filterItems()">            </div>
             
             <div style="overflow-x:auto;">
                 <table id="itemsTable">
@@ -292,6 +291,9 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
                         </tr>
                     </thead>
                     <tbody>
+                        <tr id="no-search-placeholder" class="no-search-placeholder">
+                            <td colspan="8">Start typing in the search box to find items...</td>
+                        </tr>
                         <?php 
                         $result = $conn->query("SELECT * FROM items");
                         if ($result && $result->num_rows > 0) {
@@ -299,8 +301,7 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
                                 $stock_number = $row['stock_number'];
                                 $existing_item = $ris_items[$stock_number] ?? null;
                                 
-                                echo '<tr class="item-row" data-stock="' . htmlspecialchars(strtolower($stock_number)) . '"data-item_name="' . htmlspecialchars(strtolower($row['item_name'])) . '" data-description="' . htmlspecialchars(strtolower($row['description'])) . '" data-unit="' . htmlspecialchars(strtolower($row['unit'])) . '">';
-                                echo '<td><input type="hidden" name="stock_number[]" value="' . htmlspecialchars($stock_number) . '">' . htmlspecialchars($stock_number) . '</td>';
+                                echo '<tr class="item-row hidden" data-stock="' . htmlspecialchars(strtolower($stock_number)) . '" data-item_name="' . htmlspecialchars(strtolower($row['item_name'])) . '" data-description="' . htmlspecialchars(strtolower($row['description'])) . '" data-unit="' . htmlspecialchars(strtolower($row['unit'])) . '">';                                echo '<td><input type="hidden" name="stock_number[]" value="' . htmlspecialchars($stock_number) . '">' . htmlspecialchars($stock_number) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['item_name']) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['description']) . '</td>';
                                 echo '<td>' . htmlspecialchars($row['unit']) . '</td>';
@@ -316,7 +317,7 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
                                 echo '</tr>';
                             }
                         } else {
-                            echo '<tr id="no-items-row"><td colspan="7">No inventory items found.</td></tr>';
+                            echo '<tr id="no-items-row"><td colspan="8">No inventory items found.</td></tr>';
                         }
                         ?>
                     </tbody>
@@ -349,51 +350,79 @@ $auto_ris_number = $is_editing ? $ris_data['ris_no'] : generateRISNumber($conn);
     </div>
 
     <script>
-    function filterItems() {
-        // Get the search input value and convert to lowercase
-        const searchValue = document.getElementById('itemSearch').value.toLowerCase();
-        
-        // Get all item rows
-        const itemRows = document.querySelectorAll('.item-row');
-        
-        // Counter for visible rows
-        let visibleRows = 0;
-        
-        // Loop through each row
-        itemRows.forEach(function(row) {
-            // Get the data attributes (stock number,item_name, description, unit)
-            const stockNumber = row.getAttribute('data-stock');
-            const item_name = row.getAttribute('data-item_name');
-            const description = row.getAttribute('data-description');
-            const unit = row.getAttribute('data-unit');
+        function filterItems() {
+            // Get the search input value and convert to lowercase
+            const searchValue = document.getElementById('itemSearch').value.toLowerCase();
             
-            // Check if search value matches any of the fields
-            if (stockNumber.includes(searchValue) || 
-                item_name.includes(searchValue) ||
-                description.includes(searchValue) || 
-                unit.includes(searchValue)) {
-                // Show the row
-                row.style.display = '';
-                visibleRows++;
-            } else {
-                // Hide the row
-                row.style.display = 'none';
+            // Get all item rows
+            const itemRows = document.querySelectorAll('.item-row');
+            const noSearchPlaceholder = document.getElementById('no-search-placeholder');
+            
+            // Counter for visible rows
+            let visibleRows = 0;
+            
+            // If search is empty, hide all rows and show placeholder
+            if (searchValue.trim() === '') {
+                itemRows.forEach(function(row) {
+                    row.classList.remove('visible');
+                    row.classList.add('hidden');
+                });
+                
+                // Show the placeholder
+                if (noSearchPlaceholder) {
+                    noSearchPlaceholder.style.display = 'table-row';
+                }
+                
+                // Hide the no items message
+                const noItemsRow = document.getElementById('no-items-row');
+                if (noItemsRow) {
+                    noItemsRow.style.display = 'none';
+                }
+                return;
             }
-        });
-        
-        // Handle the "no items found" message
-        const noItemsRow = document.getElementById('no-items-row');
-        if (noItemsRow) {
-            if (visibleRows === 0 && searchValue.trim() !== '') {
-                // Show "no results found" message
-                noItemsRow.style.display = '';
-                noItemsRow.innerHTML = '<td colspan="7">No items match your search criteria.</td>';
-            } else {
-                // Hide the message
-                noItemsRow.style.display = 'none';
+            
+            // Hide the placeholder when searching
+            if (noSearchPlaceholder) {
+                noSearchPlaceholder.style.display = 'none';
+            }
+            
+            // Loop through each row
+            itemRows.forEach(function(row) {
+                // Get the data attributes
+                const stockNumber = row.getAttribute('data-stock');
+                const item_name = row.getAttribute('data-item_name');
+                const description = row.getAttribute('data-description');
+                const unit = row.getAttribute('data-unit');
+                
+                // Check if search value matches any of the fields
+                if ((stockNumber && stockNumber.includes(searchValue)) || 
+                    (item_name && item_name.includes(searchValue)) ||
+                    (description && description.includes(searchValue)) || 
+                    (unit && unit.includes(searchValue))) {
+                    // Show the row
+                    row.classList.remove('hidden');
+                    row.classList.add('visible');
+                    visibleRows++;
+                } else {
+                    // Hide the row
+                    row.classList.remove('visible');
+                    row.classList.add('hidden');
+                }
+            });
+            
+            // Handle the "no items found" message
+            const noItemsRow = document.getElementById('no-items-row');
+            if (noItemsRow) {
+                if (visibleRows === 0) {
+                    // Show "no results found" message
+                    noItemsRow.style.display = 'table-row';
+                    noItemsRow.innerHTML = '<td colspan="8">No items match your search criteria.</td>';
+                } else {
+                    // Hide the message
+                    noItemsRow.style.display = 'none';
+                }
             }
         }
-    }
     </script>
 </body>
 </html>
