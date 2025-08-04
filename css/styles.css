@@ -1770,11 +1770,7 @@ tbody tr:hover {
 }
 
 
-.btn-danger {
-    position: absolute!important;
-    right: 5 !important;
-    height: 53px !important;
-}
+
 
 .table-controls {
     display: flex;

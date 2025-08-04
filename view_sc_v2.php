@@ -80,7 +80,7 @@ $archived_count = $conn->query($archived_sql)->fetch_assoc()['cnt'];
 
     <div class="ris-actions">
         <a href="SC.php" class="btn btn-secondary">← Back to SC List</a>
-        <a href="sc_export.php?item_id=<?php echo $item_id; ?>" class="btn btn-primary">📄 Export PDF</a>
+        <a href="sc_export.php?item_id=<?php echo $item_id; ?>" class="btn btn-primary" id="export_sc">📄 Export PDF</a>
 
         <form method="POST" 
             action="" 

@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 logItemHistory($conn, $item_id, $issued_qty, 'issued', $ris_no);
             }
 
-            // Recalculate average cost (this happens AFTER we've saved the original cost)
+            // Recalculate average cost
             $stmt = $conn->prepare("SELECT item_id FROM items WHERE stock_number = ?");
             $stmt->bind_param("s", $stock_no);
             $stmt->execute();

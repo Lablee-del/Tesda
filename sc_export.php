@@ -22,9 +22,8 @@ $items = $item_result->fetch_assoc();
 $item_stmt->close();
 
 $history_stmt = $conn->prepare("
-  SELECT ih.*, r.ris_no 
+  SELECT ih.*
   FROM item_history ih
-  LEFT JOIN ris r ON ih.reference_id = r.ris_id
   WHERE ih.item_id = ?
   ORDER BY ih.changed_at DESC
 ");
@@ -277,7 +276,10 @@ $ris = ['entity_name' => 'TESDA'];
         <?php if (count($history_rows) > 0): ?>
           <?php foreach ($history_rows as $h):
             $date = date('M d, Y', strtotime($h['changed_at']));
-            $ris_no = isset($h['ris_no']) ? htmlspecialchars($h['ris_no']) : '';
+
+            // temporary (fix this shit)
+            $ris_no = isset($ris['ris_no']) ? htmlspecialchars($ris['ris_no']) : '';
+
             $receipt_qty = $h['quantity_change'] > 0 ? htmlspecialchars($h['quantity_change']) : '';
             $issue_qty = $h['quantity_change'] < 0 ? abs(htmlspecialchars($h['quantity_change'])) : '';
             $office = ''; // fill if you have office info
@@ -286,8 +288,10 @@ $ris = ['entity_name' => 'TESDA'];
           ?>
             <tr>
               <td><?php echo $date; ?></td>
+
               <!-- Temporary (ris_no) -->
               <td><?php echo $ris_no; ?></td>
+
               <td><?php echo $receipt_qty; ?></td>
               <td><?php echo $issue_qty; ?></td>
               <td><?php echo $office; ?></td>

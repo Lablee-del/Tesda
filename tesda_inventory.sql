@@ -393,9 +393,11 @@ ALTER TABLE item_history
 MODIFY COLUMN reference_id VARCHAR(255) NULL 
 AFTER change_type;
 
-<!-- cleared history-->
-
 CREATE TABLE item_history_archive LIKE item_history;
+
+ALTER TABLE item_history
+MODIFY COLUMN reference_id VARCHAR(255);
+
 
 -- Property Cards table for semi-expendable supplies
 CREATE TABLE `property_cards` (
