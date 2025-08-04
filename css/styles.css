@@ -1769,6 +1769,17 @@ tbody tr:hover {
     margin-bottom: 20px;
 }
 
+.search-input-rpci{
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--border-gray);
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: var(--light-gray);
+    box-sizing: border-box;
+}
+
 
 
 

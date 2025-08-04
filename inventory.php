@@ -111,6 +111,9 @@ if (isset($_GET['action'])) {
 
                         updateAverageCost($conn, $new_id);
 
+                        // record history
+                        logItemHistory($conn, $new_id, $quantity_on_hand, 'add');
+
                         echo json_encode([
                             'success' => true, 
                             'message' => 'Item added successfully',

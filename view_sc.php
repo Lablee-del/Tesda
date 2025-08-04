@@ -139,8 +139,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($history_rows as $h): ?>
-                                <tr>
+
+                        <?php 
+                        // Map change_type to more readable text
+                        $change_labels = [
+                            'add' => 'Added New Item',
+                            'entry' => 'New Stock Entry',
+                            'update' => 'Updated Item',
+                            'cleared' => 'Cleared History',
+                            'delete' => 'Deleted Item',
+                            'issue' => 'Issued Item',
+                        ];
+                    
+                                foreach ($history_rows as $h): 
+                                    $type_label = $change_labels[$h['change_type']] ?? ucfirst($h['change_type']);
+                                ?>
                                     <td><?= date('M d, Y H:i', strtotime($h['changed_at'])) ?></td>
                                     <td><?= htmlspecialchars($h['stock_number']) ?></td>
                                     <td><?= htmlspecialchars($h['item_name']) ?></td>
@@ -152,7 +165,7 @@
                                     <td style="color: <?= $h['quantity_change'] > 0 ? 'green' : ($h['quantity_change'] < 0 ? 'red' : 'gray') ?>;">
                                         <?= $h['quantity_change'] > 0 ? '+' : '' ?><?= $h['quantity_change'] ?>
                                     </td>
-                                    <td><?= ucfirst($h['change_type']) ?></td>
+                                    <td><?= htmlspecialchars($type_label) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

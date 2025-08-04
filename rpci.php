@@ -4,7 +4,7 @@ include 'sidebar.php';
 
 // Fetch inventory items from database
 $inventory_items = [];
-$sql = "SELECT item_name, description, stock_number FROM items ORDER BY item_name";
+$sql = "SELECT item_name, description, stock_number, unit, unit_cost FROM items ORDER BY item_name";
 $result = $conn->query($sql);
 
 if ($result) {
@@ -71,10 +71,11 @@ if ($result) {
                         <option value="25">25</option>
                         <option value="all">All</option>
                     </select>
-                    <div class="search-container-sc">
-                                <input type="text" id="searchInput" class="search-input-sc" placeholder="Search by stock number, item, or unit...">
-                    </div>
                 </div>
+
+                    <div class="search-container">
+                                <input type="text" id="searchInput" class="search-input-rpci" placeholder="Search by stock number, item, or unit...">
+                    </div>
 
             <div class="rpci-table-wrapper">
                 <table class="rpci-table" id="rpci-table">
@@ -113,8 +114,8 @@ if ($result) {
                                 // Stock Number from database
                                 echo '<td>' . htmlspecialchars($item['stock_number'] ?? '') . '</td>';
                                 // Empty cells for manual input or future database integration
-                                echo '<td></td>'; // Unit of Measure
-                                echo '<td class="currency"></td>'; // Unit Value
+                                echo '<td>' . htmlspecialchars($item['unit' ?? '']) . '</td>'; // Unit of Measure
+                                echo '<td class="currency">' . htmlspecialchars($item['unit_cost' ?? '']) . '</td>'; // Unit Value
                                 echo '<td></td>'; // Balance Per Card
                                 echo '<td></td>'; // On Hand Per Count
                                 echo '<td></td>'; // Shortage/Overage Quantity
@@ -164,17 +165,17 @@ if ($result) {
     </div>
     
     <script>
-    function openExport() {
-        const params = new URLSearchParams({
-            report_date: document.getElementById('report_date').value,
-            fund_cluster: document.getElementById('fund_cluster').value,
-            accountable_officer: document.getElementById('accountable_officer').value,
-            official_designation: document.getElementById('official_designation').value,
-            entity_name: document.getElementById('entity_name').value,
-            assumption_date: document.getElementById('assumption_date').value,
-        });
-        window.open('./rpci_export.php?' + params.toString(), '_blank');
-    }
+        function openExport() {
+            const params = new URLSearchParams({
+                report_date: document.getElementById('report_date').value,
+                fund_cluster: document.getElementById('fund_cluster').value,
+                accountable_officer: document.getElementById('accountable_officer').value,
+                official_designation: document.getElementById('official_designation').value,
+                entity_name: document.getElementById('entity_name').value,
+                assumption_date: document.getElementById('assumption_date').value,
+            });
+            window.location.href = './rpci_export.php?' + params.toString();
+        }
     </script>
 
     <script>

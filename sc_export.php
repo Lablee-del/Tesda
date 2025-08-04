@@ -22,8 +22,9 @@ $items = $item_result->fetch_assoc();
 $item_stmt->close();
 
 $history_stmt = $conn->prepare("
-  SELECT ih.*
+  SELECT ih.*, r.ris_no AS ris_no
   FROM item_history ih
+  LEFT JOIN ris r ON ih.ris_id = r.ris_id
   WHERE ih.item_id = ?
   ORDER BY ih.changed_at DESC
 ");
@@ -278,7 +279,7 @@ $ris = ['entity_name' => 'TESDA'];
             $date = date('M d, Y', strtotime($h['changed_at']));
 
             // temporary (fix this shit)
-            $ris_no = isset($ris['ris_no']) ? htmlspecialchars($ris['ris_no']) : '';
+            $ris_no = !empty($h['ris_no']) ? htmlspecialchars($h['ris_no']) : '';
 
             $receipt_qty = $h['quantity_change'] > 0 ? htmlspecialchars($h['quantity_change']) : '';
             $issue_qty = $h['quantity_change'] < 0 ? abs(htmlspecialchars($h['quantity_change'])) : '';

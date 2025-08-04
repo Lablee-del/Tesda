@@ -17,7 +17,7 @@ function updateAverageCost($conn, $item_id) {
     $avg_stmt->close();
 }
 
-function logItemHistory($conn, $item_id, $change_type = 'update') {
+function logItemHistory($conn, $item_id, ?int $quantity_change = null, string $change_type = 'update', ?int $ris_id = null) {
     // Fetch current item info
     $stmt = $conn->prepare("SELECT * FROM items WHERE item_id = ?");
     $stmt->bind_param("i", $item_id);
@@ -30,7 +30,7 @@ function logItemHistory($conn, $item_id, $change_type = 'update') {
         return; // No such item, skip logging
     }
 
-    // Get previous quantity (from latest history or initial_quantity fallback)
+    // Get previous quantity (latest history) or fallback to initial_quantity
     $prev_stmt = $conn->prepare("SELECT quantity_on_hand FROM item_history WHERE item_id = ? ORDER BY changed_at DESC LIMIT 1");
     $prev_stmt->bind_param("i", $item_id);
     $prev_stmt->execute();
@@ -38,21 +38,17 @@ function logItemHistory($conn, $item_id, $change_type = 'update') {
     $prev_row = $prev_result->fetch_assoc();
     $prev_stmt->close();
 
-    $previous_quantity = isset($prev_row['quantity_on_hand']) 
-        ? intval($prev_row['quantity_on_hand']) 
+    $previous_quantity = isset($prev_row['quantity_on_hand'])
+        ? intval($prev_row['quantity_on_hand'])
         : (isset($item['initial_quantity']) ? intval($item['initial_quantity']) : 0);
 
-    // Current quantity (what's in the items table right now)
+    // Current quantity from items table
     $current_quantity = intval($item['quantity_on_hand']);
 
-    // If clearing entries, we want to log BEFORE reset
-    if ($change_type === 'cleared') {
-        // Simulate what the new quantity will be after clearing
-        $current_quantity = intval($item['initial_quantity']);
+    // If quantity_change not provided, derive it
+    if ($quantity_change === null) {
+        $quantity_change = $current_quantity - $previous_quantity;
     }
-
-    // Calculate change in quantity
-    $quantity_change = $current_quantity - $previous_quantity;
 
     // Determine change direction
     $change_direction = match(true) {
@@ -61,7 +57,7 @@ function logItemHistory($conn, $item_id, $change_type = 'update') {
         default              => 'no_change'
     };
 
-    // Insert into history
+    // Insert into history, including ris_id if available
     $insert = $conn->prepare("
         INSERT INTO item_history (
             item_id,
@@ -74,23 +70,29 @@ function logItemHistory($conn, $item_id, $change_type = 'update') {
             quantity_on_hand,
             quantity_change,
             change_direction,
-            change_type
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            change_type,
+            ris_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
+    // Use item['unit_cost'] or maybe average_unit_cost depending on semantics
+    $unit_cost = $item['unit_cost'];
+
+    // ris_id may be null; bind_param requires a value, so coalesce to null
     $insert->bind_param(
-        "issssdiisss",
+        "issssidiissi",
         $item_id,
         $item['stock_number'],
         $item['item_name'],
         $item['description'],
         $item['unit'],
         $item['reorder_point'],
-        $item['unit_cost'],
+        $unit_cost,
         $current_quantity,
         $quantity_change,
         $change_direction,
-        $change_type
+        $change_type,
+        $ris_id
     );
 
     $insert->execute();

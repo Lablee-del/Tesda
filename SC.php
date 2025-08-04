@@ -15,8 +15,11 @@
     <h2> Stock Card (SC)</h2>
 
     
-<div class="search-container-sc">
-            <input type="text" id="searchInput" class="search-input-sc" placeholder="Search by stock number, item, or unit...">
+<div class="search-container-sc" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+    <input type="text" id="searchInput" class="search-input-sc" placeholder="Search by stock number, item, or unit...">
+    <a href="sc_export_all.php" class="btn export_all" title="Export All Items" style="padding: 0.5rem 1rem; background:#2d6cdf; color:#fff; border-radius:6px; text-decoration:none; font-size:0.9rem; display:inline-flex; align-items:center; gap:0.4rem;">
+        <i class="fas fa-file-export" aria-hidden="true"></i> Export All
+    </a>
 </div>
 
 
