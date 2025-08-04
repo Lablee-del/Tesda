@@ -4,7 +4,7 @@ require 'config.php';
 
 // Fetch inventory items from database
 $inventory_items = [];
-$sql = "SELECT item_name, description, stock_number FROM items ORDER BY item_name";
+$sql = "SELECT item_name, description, stock_number, unit, unit_cost FROM items ORDER BY item_name";
 $result = $conn->query($sql);
 if ($result) {
     while ($row = $result->fetch_assoc()) {
@@ -228,8 +228,8 @@ $assumption_date = htmlspecialchars($_GET['assumption_date'] ?? '');
                             echo '<td>' . htmlspecialchars($item['item_name'] ?? '') . '</td>';
                             echo '<td>' . htmlspecialchars($item['description'] ?? '') . '</td>';
                             echo '<td>' . htmlspecialchars($item['stock_number'] ?? '') . '</td>';
-                            echo '<td>&nbsp;</td>'; // unit
-                            echo '<td>&nbsp;</td>'; // unit value
+                            echo '<td>' . htmlspecialchars($item['unit']) . '</td>'; // unit
+                            echo '<td>' . htmlspecialchars($item['unit_cost']) . '</td>'; // unit value
                             echo '<td>&nbsp;</td>'; // balance per card
                             echo '<td>&nbsp;</td>'; // on hand
                             echo '<td>&nbsp;</td>'; // shortage qty
