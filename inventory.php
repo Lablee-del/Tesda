@@ -333,7 +333,7 @@ if (isset($_GET['action'])) {
                     
                     if ($update_stmt->execute()) {
                         //Log History
-                        logItemHistory($conn, $item_id, null, 'cleared');
+                        logItemHistory($conn, item_id: $item_id, null, 'cleared');
                         echo json_encode(['success' => true, 'message' => 'All entries cleared successfully']);
                     } else {
                         echo json_encode(['success' => false, 'message' => 'Error updating item quantities']);
