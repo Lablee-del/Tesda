@@ -8,10 +8,7 @@
     <style>
         .export-section {
             margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
             border-radius: 5px;
-            border: 1px solid #dee2e6;
         }
         
         .export-btn {
