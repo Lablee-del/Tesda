@@ -88,7 +88,8 @@ if (isset($_GET['action'])) {
 
                         updateAverageCost($conn, $existing_item['item_id']);
                         //Log History
-                        logItemHistory($conn, $existing_item['item_id'], 'entry');
+                        logItemHistory($conn, $existing_item['item_id'], $quantity_on_hand, 'entry');
+
 
                         echo json_encode([
                             'success' => true, 
@@ -196,8 +197,7 @@ if (isset($_GET['action'])) {
                     // UPDATE AVERAGE COST - ADD THIS LINE:
                     updateAverageCost($conn, $id);
                     //Log history
-                    logItemHistory($conn, $id);
-                    
+                    logItemHistory($conn, $id, null, 'update');                    
                     // Get current values for response
                     $get_stmt = $conn->prepare("SELECT * FROM items WHERE item_id = ?");
                     $get_stmt->bind_param("i", $id);
@@ -257,7 +257,7 @@ if (isset($_GET['action'])) {
                         }
                         $check_initial_stmt->close();
                         // Log history
-                        logItemHistory($conn, $id);
+                        logItemHistory($conn, $id, null, 'update');
                         
                         echo json_encode([
                             'success' => true, 
@@ -333,7 +333,7 @@ if (isset($_GET['action'])) {
                     
                     if ($update_stmt->execute()) {
                         //Log History
-                        logItemHistory($conn, $item_id, 'cleared');
+                        logItemHistory($conn, $item_id, null, 'cleared');
                         echo json_encode(['success' => true, 'message' => 'All entries cleared successfully']);
                     } else {
                         echo json_encode(['success' => false, 'message' => 'Error updating item quantities']);
