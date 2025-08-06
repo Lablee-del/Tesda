@@ -85,6 +85,10 @@ h2::after {
 .notification.error {
             background-color: #f44336;
 }
+.notification.info {
+    background-color: #3498db;
+    color: white;
+}
 
 .loading {
     display: inline-block;

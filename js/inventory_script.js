@@ -62,7 +62,7 @@ function checkStockNumber(stockNumber) {
     .then(data => {
         if (data.exists) {
             // Stock number exists - populate fields but allow unit cost to be editable
-            statusDiv.innerHTML = '<i class="fas fa-info-circle text-info"></i> Existing item found. You can add different unit cost.';
+            statusDiv.innerHTML = '<i class="fas fa-info-circle text-info"></i> Existing item found. You can add different Unit Cost and/or Quantity.';
             statusDiv.className = 'stock-status info';
             
             document.getElementById('add_item_name').value = data.item.item_name;
@@ -182,19 +182,111 @@ document.getElementById('addForm').addEventListener('submit', function(e) {
     });
 });
 
-
-// Edit item form submission
+// Enhanced edit form submission with selective field updates
 document.getElementById('editForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    const formData = new FormData(this);
+    // Get current form values
+    const currentValues = {
+        stock_number: document.getElementById('edit_stock_number').value.trim(),
+        item_name: document.getElementById('edit_item_name').value.trim(),
+        description: document.getElementById('edit_description').value.trim(),
+        unit: document.getElementById('edit_unit').value.trim(),
+        reorder_point: parseInt(document.getElementById('edit_reorder_point').value),
+        unit_cost: parseFloat(document.getElementById('edit_unit_cost').value),
+        quantity_on_hand: parseInt(document.getElementById('edit_quantity_on_hand').value)
+    };
+    
+    // Get original values (stored when modal was opened)
+    const originalValues = {
+        stock_number: document.getElementById('edit_stock_number').dataset.originalValue || '',
+        item_name: document.getElementById('edit_item_name').dataset.originalValue || '',
+        description: document.getElementById('edit_description').dataset.originalValue || '',
+        unit: document.getElementById('edit_unit').dataset.originalValue || '',
+        reorder_point: parseInt(document.getElementById('edit_reorder_point').dataset.originalValue || '0'),
+        unit_cost: parseFloat(document.getElementById('edit_unit_cost').dataset.originalValue || '0'),
+        quantity_on_hand: parseInt(document.getElementById('edit_quantity_on_hand').dataset.originalValue || '0')
+    };
+    
+    // Identify which fields have changed
+    const changedFields = {};
+    let hasChanges = false;
+    
+    Object.keys(currentValues).forEach(key => {
+        let isChanged = false;
+        
+        if (key === 'unit_cost') {
+            // Handle floating point comparison with small tolerance
+            isChanged = Math.abs(currentValues[key] - originalValues[key]) > 0.001;
+        } else if (key === 'reorder_point' || key === 'quantity_on_hand') {
+            // Handle integer comparison
+            isChanged = currentValues[key] !== originalValues[key];
+        } else {
+            // Handle string comparison
+            isChanged = currentValues[key] !== originalValues[key];
+        }
+        
+        if (isChanged) {
+            changedFields[key] = currentValues[key];
+            hasChanges = true;
+        }
+    });
+    
+    // If no changes detected, just close the modal
+    if (!hasChanges) {
+        showNotification('No changes detected. Nothing to update.', 'info');
+        document.getElementById('editModal').style.display = 'none';
+        return;
+    }
+    
+    // Check if this is an item with multiple entries and if critical fields changed
+    const itemId = document.getElementById('edit_item_id').value;
+    const note = document.getElementById('multiple-entries-note');
+    const criticalFieldsChanged = changedFields.hasOwnProperty('unit_cost') || changedFields.hasOwnProperty('quantity_on_hand');
+    
+    if (note && criticalFieldsChanged) {
+        // Show confirmation only when critical fields are changed
+        const confirmed = confirm(
+            'WARNING: You have changed the quantity or unit cost.\n\n' +
+            'This will PERMANENTLY DELETE all inventory entries and use the new values as base values.\n\n' +
+            'This action cannot be undone. Are you sure you want to continue?'
+        );
+        
+        if (!confirmed) {
+            return; // User cancelled
+        }
+    }
+    
+    // Create FormData with changed fields
+    const formData = new FormData();
+    formData.append('item_id', itemId);
+    
+    // Special handling for items with multiple entries:
+    // If only quantity changed but unit cost didn't, we need to include both
+    // because when entries are cleared, both need to be updated together
+    if (note && changedFields.hasOwnProperty('quantity_on_hand') && !changedFields.hasOwnProperty('unit_cost')) {
+        // Include the current unit cost value even if it didn't change
+        changedFields['unit_cost'] = currentValues['unit_cost'];
+        console.log('Added unit_cost to update because quantity changed on item with multiple entries');
+    }
+    
+    // Add all changed fields (and unit_cost if needed for multiple entries scenario)
+    Object.keys(changedFields).forEach(field => {
+        formData.append(field, changedFields[field]);
+    });
+    
+    // Add a field to indicate this is a selective update
+    formData.append('selective_update', 'true');
+    
+    // Show which fields are being updated
+    const fieldNames = Object.keys(changedFields).map(field => field.replace('_', ' ')).join(', ');
+    console.log(`Updating fields: ${fieldNames}`);
     
     fetch('?action=update', {
         method: 'POST',
         body: formData
     })
     .then(response => {
-        // Log the response to see what we're getting
         return response.text().then(text => {
             console.log('Raw response:', text);
             try {
@@ -213,7 +305,7 @@ document.getElementById('editForm').addEventListener('submit', function(e) {
             // Refresh the page to show updated data
             setTimeout(() => {
                 location.reload();
-            }, 500); // Small delay to let user see the success message
+            }, 1000); // Give user time to see the success message
             
         } else {
             showNotification(data.message, 'error');
@@ -225,24 +317,37 @@ document.getElementById('editForm').addEventListener('submit', function(e) {
     });
 });
 
+// Modified openEditModal function to store original values
 function openEditModal(button) {
     const modal = document.getElementById('editModal');
     const itemId = button.dataset.id;
     
+    // Set form values
     document.getElementById('edit_item_id').value = itemId;
     document.getElementById('edit_stock_number').value = button.dataset.stock_number;
     document.getElementById('edit_item_name').value = button.dataset.item_name;
     document.getElementById('edit_description').value = button.dataset.description;
     document.getElementById('edit_unit').value = button.dataset.unit;
     document.getElementById('edit_reorder_point').value = button.dataset.reorder_point;
-    document.getElementById('edit_unit_cost').value = button.dataset.unit_cost;
+    document.getElementById('edit_unit_cost').value = parseFloat(button.dataset.unit_cost).toFixed(2);
     document.getElementById('edit_quantity_on_hand').value = button.dataset.quantity_on_hand;
     
-    // Check if item has multiple entries (initial + inventory entries)
+    // Store original values in data attributes for change detection
+    document.getElementById('edit_stock_number').dataset.originalValue = button.dataset.stock_number;
+    document.getElementById('edit_item_name').dataset.originalValue = button.dataset.item_name;
+    document.getElementById('edit_description').dataset.originalValue = button.dataset.description;
+    document.getElementById('edit_unit').dataset.originalValue = button.dataset.unit;
+    document.getElementById('edit_reorder_point').dataset.originalValue = button.dataset.reorder_point;
+    document.getElementById('edit_unit_cost').dataset.originalValue = parseFloat(button.dataset.unit_cost).toFixed(2);
+    document.getElementById('edit_quantity_on_hand').dataset.originalValue = button.dataset.quantity_on_hand;
+    
+    // Check if item has multiple entries
     checkMultipleEntries(itemId);
     
     modal.style.display = 'block';
 }
+
+
 function checkMultipleEntries(itemId) {
     fetch('?action=check_entries', {
         method: 'POST',
@@ -258,30 +363,69 @@ function checkMultipleEntries(itemId) {
         const unitCostLabel = unitCostField.previousElementSibling;
         const quantityLabel = quantityField.previousElementSibling;
         
+        // Remove any existing warning note
+        const existingNote = document.getElementById('multiple-entries-note');
+        if (existingNote) existingNote.remove();
+        
         if (data.hasMultipleEntries) {
-            // Hide the fields and labels entirely
-            unitCostField.style.display = 'none';
-            quantityField.style.display = 'none';
-            unitCostLabel.style.display = 'none';
-            quantityLabel.style.display = 'none';
-            
-            // Add a note explaining why these fields are hidden
-            if (!document.getElementById('multiple-entries-note')) {
-                const note = document.createElement('div');
-                note.id = 'multiple-entries-note';
-                note.innerHTML = '<p style="color: #666; font-style: italic; margin: 10px 0;"><i class="fas fa-info-circle"></i> Unit cost and quantity cannot be edited - this item has multiple inventory entries.</p>';
-                quantityLabel.parentNode.insertBefore(note, quantityLabel.nextSibling);
-            }
-        } else {
-            // Show the fields and labels
+            // Show fields normally
             unitCostField.style.display = '';
             quantityField.style.display = '';
             unitCostLabel.style.display = '';
             quantityLabel.style.display = '';
             
-            // Remove the note if it exists
-            const note = document.getElementById('multiple-entries-note');
-            if (note) note.remove();
+            // Enable fields
+            unitCostField.readOnly = false;
+            quantityField.readOnly = false;
+            unitCostField.style.backgroundColor = '';
+            quantityField.style.backgroundColor = '';
+            
+            // Store original values for comparison
+            unitCostField.dataset.originalValue = unitCostField.value;
+            quantityField.dataset.originalValue = quantityField.value;
+            
+            // Add a warning note that updates based on changes
+            const note = document.createElement('div');
+            note.id = 'multiple-entries-note';
+            note.innerHTML = `
+                <div style="color: #0984e3; font-weight: bold; margin: 15px 0; padding: 15px; background: #e3f2fd; border: 2px solid #81c784; border-radius: 8px;">
+                    <i class="fas fa-info-circle"></i> <strong>NOTICE:</strong> 
+                    <p style="margin: 5px 0 0 0;">This item has <strong>${data.entryCount}</strong> inventory entries plus initial stock.</p>
+                    <p style="margin: 5px 0 0 0;" id="edit-behavior-text">• You can safely edit other fields (stock number, name, description, etc.) without affecting entries.</p>
+                    <p style="margin: 5px 0 0 0; color: #d63031;" id="warning-text" style="display: none;"><strong>⚠️ Changing quantity or unit cost will permanently delete ALL entries!</strong></p>
+                </div>
+            `;
+            quantityField.parentNode.insertBefore(note, quantityField.nextSibling);
+            
+            // Add event listeners to show/hide warning based on changes
+            const updateWarning = () => {
+                const costChanged = parseFloat(unitCostField.value) !== parseFloat(unitCostField.dataset.originalValue);
+                const quantityChanged = parseInt(quantityField.value) !== parseInt(quantityField.dataset.originalValue);
+                const warningText = document.getElementById('warning-text');
+                const noteDiv = note.querySelector('div');
+                
+                if (costChanged || quantityChanged) {
+                    warningText.style.display = 'block';
+                    noteDiv.style.borderColor = '#d63031';
+                    noteDiv.style.backgroundColor = '#ffeaa7';
+                    noteDiv.style.color = '#d63031';
+                } else {
+                    warningText.style.display = 'none';
+                    noteDiv.style.borderColor = '#81c784';
+                    noteDiv.style.backgroundColor = '#e3f2fd';
+                    noteDiv.style.color = '#0984e3';
+                }
+            };
+            
+            unitCostField.addEventListener('input', updateWarning);
+            quantityField.addEventListener('input', updateWarning);
+            
+        } else {
+            // Show fields normally for items without multiple entries
+            unitCostField.style.display = '';
+            quantityField.style.display = '';
+            unitCostLabel.style.display = '';
+            quantityLabel.style.display = '';
             
             // Enable fields
             unitCostField.readOnly = false;
@@ -294,6 +438,7 @@ function checkMultipleEntries(itemId) {
         console.error('Error checking entries:', error);
     });
 }
+
 
 function deleteItem(id) {
     if (confirm('Are you sure you want to delete this item?')) {
@@ -341,7 +486,7 @@ function addRowToTable(item) {
             </div>
         </td>
         <td class="cost-cell">
-        <div class="main-cost">₱ ${Number(item.average_unit_cost || item.unit_cost).toLocaleString('en-PH', {minimumFractionDigits: 2})}${item.has_multiple_entries ? ' (average)' : ''}</div>            <div class="sub-entries" id="sub-cost-${item.item_id}"></div>
+            <div class="main-cost">₱ ${Number(item.calculated_unit_cost || item.average_unit_cost || item.unit_cost).toLocaleString('en-PH', {minimumFractionDigits: 2})}${(item.calculated_unit_cost || item.has_multiple_entries) ? ' (average)' : ''}</div>
         </td>
         <td class="currency">₱ ${totalCost.toLocaleString('en-PH', {minimumFractionDigits: 2})}</td>
         <td>${item.reorder_point}</td>
@@ -386,7 +531,7 @@ function updateRowInTable(item) {
             </div>
         </td>
             <td class="cost-cell">
-                <div class="main-cost">₱ ${Number(item.average_unit_cost || item.unit_cost).toLocaleString('en-PH', {minimumFractionDigits: 2})}${item.has_multiple_entries ? ' (average)' : ''}</div>
+                <div class="main-cost">₱ ${Number(item.calculated_unit_cost || item.average_unit_cost || item.unit_cost).toLocaleString('en-PH', {minimumFractionDigits: 2})}${(item.calculated_unit_cost || item.has_multiple_entries) ? ' (average)' : ''}</div>
                 <div class="sub-entries" id="sub-cost-${item.item_id}"></div>
             </td>            <td class="currency">₱ ${totalCost.toLocaleString('en-PH', {minimumFractionDigits: 2})}</td>
             <td>${item.reorder_point}</td>
@@ -419,6 +564,7 @@ function removeRowFromTable(id) {
     }
 }
 
+// Enhanced showNotification function to handle 'info' type
 function showNotification(message, type) {
     const notification = document.getElementById('notification');
     notification.textContent = message;
@@ -441,6 +587,7 @@ function clearEntries(itemId) {
         .then(data => {
             if (data.success) {
                 showNotification(data.message, 'success');
+                
                 // Refresh the page to show updated data
                 setTimeout(() => {
                     location.reload();
@@ -448,6 +595,8 @@ function clearEntries(itemId) {
             } else {
                 showNotification(data.message, 'error');
             }
+            
+            
         })
         .catch(error => {
             showNotification('An error occurred while clearing entries.', 'error');
@@ -455,4 +604,3 @@ function clearEntries(itemId) {
         });
     }
 }
-
