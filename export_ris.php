@@ -44,6 +44,15 @@ $item_result = $conn->query($item_query);
             body { margin: 0; padding: 10px; }
             .no-print { display: none !important; }
             .print-container { page-break-inside: avoid; }
+            .appendix-label {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                font-size: 11px;
+                font-style: italic;
+                font-weight: normal;
+                z-index: 1000;
+            }
         }
         
         /* General styles */
@@ -55,6 +64,7 @@ $item_result = $conn->query($item_query);
             background: #fff;
             margin: 0;
             padding: 20px;
+            position: relative;
         }
         
         .print-container {
@@ -63,6 +73,18 @@ $item_result = $conn->query($item_query);
             background: #fff;
             padding: 20px;
             border: 1px solid #ddd;
+            position: relative;
+        }
+        
+        .appendix-label {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 11px;
+            font-style: italic;
+            font-weight: normal;
+            color: #333;
+            z-index: 100;
         }
         
         .header-title {
@@ -70,9 +92,11 @@ $item_result = $conn->query($item_query);
             font-weight: bold;
             font-size: 14px;
             margin-bottom: 15px;
+            margin-top: 25px;
             border: 2px solid #000;
             padding: 8px;
             background: #f9f9f9;
+            position: relative;
         }
         
         .info-section {
@@ -234,8 +258,10 @@ $item_result = $conn->query($item_query);
         <a href="view_ris.php?ris_id=<?php echo $ris_id; ?>" class="back-button">← Back to RIS</a>
         <hr style="margin: 20px 0;">
     </div>
-
+    
     <div class="print-container">
+        <div class="appendix-label">Appendix 63</div>
+        
         <div class="header-title">REQUISITION AND ISSUE SLIP</div>
 
         <table class="info-section">

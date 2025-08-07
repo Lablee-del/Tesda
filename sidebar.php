@@ -21,7 +21,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
             <?php
                 $dropdownActive = in_array($currentPage, ['inventory.php', 'ris.php', 'add_ris.php', 'view_ris.php', 'rsmi.php', 'SC.php', 'view_sc.php', 'rpci.php']);
-                $expendablesDropdownActive = in_array($currentPage, ['PC.php', 'ics.php']);
+                $expendablesDropdownActive = in_array($currentPage, ['PC.php', 'ics.php', 'rspi.php']);
                 $ppeDropdownActive = in_array($currentPage, ['ppe_item1.php', 'ppe_item2.php']);
 
                 ?>
@@ -46,6 +46,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                             🧰 Semi Expendables
                         </button>
                         <div class="dropdown-menu">
+                            <a href="rspi.php" class="<?= $currentPage == 'rspi.php' ? 'active' : '' ?>">📦 RSPI</a>
                             <a href="PC.php" class="<?= $currentPage == 'PC.php' ? 'active' : '' ?>">🖥️ PC</a>
                             <a href="ics.php" class="<?= $currentPage == 'ics.php' ? 'active' : '' ?>">📦 ICS</a>
                         </div>
