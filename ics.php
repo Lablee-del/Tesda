@@ -45,10 +45,7 @@ switch ($sort_by) {
 <?php include 'sidebar.php'; ?>
 <div class="content">
     <h2>Inventory Custodian Slip (ICS)</h2>
-    <p class="page-description">
-        <i class="fas fa-info-circle"></i> 
-        ICS is used for issuing semi-expendable supplies and equipment to end-users to establish accountability.
-    </p>
+
     
     <div class="header-controls">
         <button onclick="window.location.href='add_ics.php'">

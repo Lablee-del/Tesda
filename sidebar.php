@@ -45,6 +45,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         <div class="dropdown-menu">
                             <a href="PC.php" class="<?= $currentPage == 'pc.php' ? 'active' : '' ?>">🖥️ PC</a>
                             <a href="ics.php" class="<?= $currentPage == 'ics.php' ? 'active' : '' ?>">📦 ICS</a>
+                            <a href="ict_registry.php" class="<?= $currentPage == 'ict_registry.php' ? 'active' : '' ?>">📦 ICT</a>
+
                         </div>
                     </div>
                 
