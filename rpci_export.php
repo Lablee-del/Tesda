@@ -1,7 +1,6 @@
 <?php
 require 'config.php';
 
-
 // Fetch inventory items from database
 $inventory_items = [];
 $sql = "SELECT item_name, description, stock_number, unit, unit_cost FROM items ORDER BY item_name";
@@ -51,37 +50,70 @@ $assumption_date = htmlspecialchars($_GET['assumption_date'] ?? '');
             border: 1px solid #000;
             padding: 16px;
             box-sizing: border-box;
+            position: relative;
+        }
+
+        .appendix {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-style: italic;
+            font-weight: normal;
+            font-size: 12px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
         }
 
         .title {
-            text-align: center;
             font-weight: bold;
             font-size: 16px;
             margin: 0;
+            text-decoration: underline;
         }
 
         .subtitle {
-            text-align: center;
             font-style: italic;
             margin: 4px 0 12px;
             font-size: 12px;
         }
 
-        .meta {
+        .form-fields {
+            margin-bottom: 15px;
+        }
+
+        .field-row {
             display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
+            align-items: center;
+            margin-bottom: 8px;
             font-size: 12px;
         }
 
-        .meta .block {
-            flex: 1 1 200px;
+        .field-row label {
+            margin-right: 8px;
         }
 
-        .accountability {
-            font-size: 10px;
-            margin-bottom: 12px;
+        .field-input {
+            border-bottom: 1px solid #000;
+            min-width: 120px;
+            padding: 0 4px;
+            margin: 0 8px;
+        }
+
+        .field-input.long {
+            min-width: 200px;
+        }
+
+        .field-input.short {
+            min-width: 80px;
+        }
+
+        .accountability-text {
+            font-size: 12px;
+            margin-bottom: 15px;
+            line-height: 1.4;
         }
 
         .table-wrapper {
@@ -98,12 +130,16 @@ $assumption_date = htmlspecialchars($_GET['assumption_date'] ?? '');
             border: 1px solid #000;
             padding: 4px 6px;
             vertical-align: top;
+            text-align: center;
         }
 
         th {
-            background: #e5e5e5;
-            text-align: center;
+            background: #f5f5f5;
             font-weight: bold;
+        }
+
+        .text-left {
+            text-align: left;
         }
 
         .small {
@@ -162,8 +198,6 @@ $assumption_date = htmlspecialchars($_GET['assumption_date'] ?? '');
             background: #6c757d;
             color: #fff;
         }
-
-        .label-inline { font-weight: bold; }
     </style>
 </head>
 <body>
@@ -184,18 +218,30 @@ $assumption_date = htmlspecialchars($_GET['assumption_date'] ?? '');
     </div>
 
     <div class="container">
-        <div>
-            <p class="title">REPORT ON THE PHYSICAL COUNT OF INVENTORIES</p>
-            <p class="subtitle">(Type of Inventory Item)</p>
+        <div class="appendix">Appendix 66</div>
+        
+        <div class="header">
+            <h1 class="title">REPORT ON THE PHYSICAL COUNT OF INVENTORIES</h1>
+            <p class="subtitle">(Type of Inventory Items)</p>
         </div>
 
-        <div class="meta">
-            <div class="block"><span class="label-inline">As at:</span> <?= $report_date ?></div>
-            <div class="block"><span class="label-inline">Fund Cluster:</span> <?= $fund_cluster ?></div>
-        </div>
-
-        <div class="accountability">
-            For which: <strong><?= $accountable_officer ?></strong>, <em>(Official Designation)</em> <strong><?= $official_designation ?></strong>, <strong><?= $entity_name ?></strong> is accountable, having assumed such accountability on <strong><?= $assumption_date ?></strong>.
+        <div class="form-fields">
+            <div class="field-row">
+                <span>As at</span>
+                <span class="field-input"><?= $report_date ?></span>
+            </div>
+            
+            <div class="field-row" style="margin-top: 15px;">
+                <span>Fund Cluster:</span>
+                <span class="field-input long"><?= $fund_cluster ?></span>
+            </div>
+            
+            <div class="accountability-text" style="margin-top: 15px;">
+                For which <span style="text-decoration: underline;"><?= $accountable_officer ?></span>, 
+                <em></em> <span style="text-decoration: underline;"><?= $official_designation ?></span>, 
+                <span style="text-decoration: underline;"><?= $entity_name ?></span> is accountable, having assumed such accountability on 
+                <span style="text-decoration: underline;"><?= $assumption_date ?></span>.
+            </div>
         </div>
 
         <div class="table-wrapper">
@@ -225,11 +271,11 @@ $assumption_date = htmlspecialchars($_GET['assumption_date'] ?? '');
                         foreach ($inventory_items as $item) {
                             echo '<tr>';
                             echo '<td>Office Supplies</td>';
-                            echo '<td>' . htmlspecialchars($item['item_name'] ?? '') . '</td>';
-                            echo '<td>' . htmlspecialchars($item['description'] ?? '') . '</td>';
+                            echo '<td class="text-left">' . htmlspecialchars($item['item_name'] ?? '') . '</td>';
+                            echo '<td class="text-left">' . htmlspecialchars($item['description'] ?? '') . '</td>';
                             echo '<td>' . htmlspecialchars($item['stock_number'] ?? '') . '</td>';
-                            echo '<td>' . htmlspecialchars($item['unit']) . '</td>'; // unit
-                            echo '<td>' . htmlspecialchars($item['unit_cost']) . '</td>'; // unit value
+                            echo '<td>' . htmlspecialchars($item['unit'] ?? '') . '</td>';
+                            echo '<td>' . htmlspecialchars($item['unit_cost'] ?? '') . '</td>';
                             echo '<td>&nbsp;</td>'; // balance per card
                             echo '<td>&nbsp;</td>'; // on hand
                             echo '<td>&nbsp;</td>'; // shortage qty
@@ -239,9 +285,11 @@ $assumption_date = htmlspecialchars($_GET['assumption_date'] ?? '');
                             $row_count++;
                         }
                     }
+                    
+                    // Add empty rows to reach minimum of 15 rows
                     for ($i = $row_count; $i < 15; $i++) {
                         echo '<tr>';
-                        for ($j = 0; $j < 12; $j++) {
+                        for ($j = 0; $j < 11; $j++) {
                             echo '<td>&nbsp;</td>';
                         }
                         echo '</tr>';
@@ -251,27 +299,25 @@ $assumption_date = htmlspecialchars($_GET['assumption_date'] ?? '');
             </table>
         </div>
 
-        <div class="signatures">
-            <table>
-                <tr>
-                    <td>
-                        <div class="sig-title">Certified Correct by:</div>
-                        <div class="sig-name">&nbsp;</div>
-                        <div class="small">Signature over Printed Name of Inventory Committee Chair and Members</div>
-                    </td>
-                    <td>
-                        <div class="sig-title">Approved by:</div>
-                        <div class="sig-name">&nbsp;</div>
-                        <div class="small">Signature over Printed Name of Head of Agency/Entity or Authorized Representative</div>
-                    </td>
-                    <td>
-                        <div class="sig-title">Verified by:</div>
-                        <div class="sig-name">&nbsp;</div>
-                        <div class="small">Signature over Printed Name of COA Representative</div>
-                    </td>
-                </tr>
-            </table>
-        </div>
+        <table class="signatures">
+            <tr>
+                <td style="width: 33.33%;">
+                    <div class="sig-title">Certified Correct by:</div>
+                    <div class="sig-name">&nbsp;</div>
+                    <div class="small">Signature over Printed Name of Inventory Committee Chair and Members</div>
+                </td>
+                <td style="width: 33.33%;">
+                    <div class="sig-title">Approved by:</div>
+                    <div class="sig-name">&nbsp;</div>
+                    <div class="small">Signature over Printed Name of Head of Agency/Entity or Authorized Representative</div>
+                </td>
+                <td style="width: 33.34%;">
+                    <div class="sig-title">Verified by:</div>
+                    <div class="sig-name">&nbsp;</div>
+                    <div class="small">Signature over Printed Name of COA Representative</div>
+                </td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>

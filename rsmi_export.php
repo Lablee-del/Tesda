@@ -115,6 +115,20 @@ if ($rsmi_result && $rsmi_result->num_rows > 0) {
             border: 2px solid black;
             max-width: 1000px;
             margin: 0 auto;
+            position: relative;
+        }
+
+        /* Appendix 64 styling */
+        .appendix-label {
+            position: absolute;
+            top: 8px;
+            right: 15px;
+            font-size: 12px;
+            font-style: italic;
+            color: black;
+            z-index: 10;
+            background: white;
+            padding: 2px 5px;
         }
 
         .header-section {
@@ -156,6 +170,7 @@ if ($rsmi_result && $rsmi_result->num_rows > 0) {
             padding: 8px;
             border-bottom: 1px solid black;
             background-color: #f8f9fa;
+            margin-top: 20px; 
         }
 
         .instructions {
@@ -284,6 +299,18 @@ if ($rsmi_result && $rsmi_result->num_rows > 0) {
                 page-break-inside: avoid;
             }
 
+            .appendix-label {
+                position: absolute;
+                top: 8px;
+                right: 15px;
+                font-size: 12px;
+                font-style: italic;
+                color: black;
+                z-index: 10;
+                background: white;
+                padding: 2px 5px;
+            }
+
             @page {
                 margin: 0.5in;
                 size: A4;
@@ -306,12 +333,15 @@ if ($rsmi_result && $rsmi_result->num_rows > 0) {
 
     <!-- Buttons -->
     <div class="button-container">
-        <button class="btn btn-primary" onclick="window.print()">📄 Print/Save as PDF</button>
+        <button class="btn btn-primary" onclick="printForm()">📄 Print/Save as PDF</button>
         <a href="rsmi.php" class="btn btn-secondary">← Back to RSMI</a>
     </div>
 
     <!-- RSMI Form -->
     <div class="form-container">
+        <!-- Appendix 64 Label -->
+        <div class="appendix-label">Appendix 64</div>
+        
         <!-- Header Section -->
         <div class="form-title">
             REPORT ON THE STOCK OF MATERIALS AND SUPPLIES ISSUED (RSMI)
@@ -514,11 +544,29 @@ if ($rsmi_result && $rsmi_result->num_rows > 0) {
     </div>
 
     <script>
+        function printForm() {
+            // Hide instructions and buttons before printing
+            const instructions = document.querySelector('.export-instructions');
+            const buttons = document.querySelector('.button-container');
+            
+            if (instructions) instructions.style.display = 'none';
+            if (buttons) buttons.style.display = 'none';
+            
+            // Print the page (opens in same tab)
+            window.print();
+            
+            // Restore visibility after printing
+            setTimeout(() => {
+                if (instructions) instructions.style.display = 'block';
+                if (buttons) buttons.style.display = 'block';
+            }, 1000);
+        }
+
         // Optional: Auto-focus print dialog on page load
         // window.addEventListener('load', function() {
         //     setTimeout(function() {
         //         if (confirm('Would you like to print/save this RSMI form as PDF?')) {
-        //             window.print();
+        //             printForm();
         //         }
         //     }, 1000);
         // });

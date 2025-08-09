@@ -21,6 +21,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
             <?php
                 $dropdownActive = in_array($currentPage, ['inventory.php', 'ris.php', 'add_ris.php', 'view_ris.php', 'rsmi.php', 'SC.php', 'view_sc.php', 'rpci.php']);
+                $expendablesDropdownActive = in_array($currentPage, ['PC.php', 'ics.php', 'rspi.php']);
+                $ppeDropdownActive = in_array($currentPage, ['ppe_item1.php', 'ppe_item2.php']);
+
                 ?>
 
                 <nav>
@@ -43,10 +46,22 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                             🧰 Semi Expendables
                         </button>
                         <div class="dropdown-menu">
-                            <a href="PC.php" class="<?= $currentPage == 'pc.php' ? 'active' : '' ?>">🖥️ PC</a>
+                            <a href="rspi.php" class="<?= $currentPage == 'rspi.php' ? 'active' : '' ?>">📦 RSPI</a>
+                            <a href="PC.php" class="<?= $currentPage == 'PC.php' ? 'active' : '' ?>">🖥️ PC</a>
                             <a href="ics.php" class="<?= $currentPage == 'ics.php' ? 'active' : '' ?>">📦 ICS</a>
                             <a href="ict_registry.php" class="<?= $currentPage == 'ict_registry.php' ? 'active' : '' ?>">📦 ICT</a>
 
+                        </div>
+                    </div>
+
+                    <!-- PPE Dropdown -->
+                    <div class="dropdown <?= $ppeDropdownActive ? 'open' : '' ?>">
+                        <button class="dropdown-toggle <?= $ppeDropdownActive ? 'active' : '' ?>">
+                            🛠️ PPE
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="ppe_item1.php" class="<?= $currentPage == 'ppe_item1.php' ? 'active' : '' ?>">📌 Placeholder 1</a>
+                            <a href="ppe_item2.php" class="<?= $currentPage == 'ppe_item2.php' ? 'active' : '' ?>">📌 Placeholder 2</a>
                         </div>
                     </div>
                 

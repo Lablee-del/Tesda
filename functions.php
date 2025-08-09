@@ -1,20 +1,48 @@
 <?php 
 
 function updateAverageCost($conn, $item_id) {
-    $avg_stmt = $conn->prepare("
-        UPDATE items i 
-        SET average_unit_cost = (
-            CASE 
-                WHEN (i.initial_quantity > 0 AND (SELECT COUNT(*) FROM inventory_entries ie WHERE ie.item_id = i.item_id) > 0)
-                THEN ((i.initial_quantity * i.unit_cost) + COALESCE((SELECT SUM(ie.quantity * ie.unit_cost) FROM inventory_entries ie WHERE ie.item_id = i.item_id), 0)) / (i.initial_quantity + COALESCE((SELECT SUM(ie.quantity) FROM inventory_entries ie WHERE ie.item_id = i.item_id), 0))
-                ELSE i.unit_cost 
-            END
-        )
-        WHERE item_id = ?
-    ");
-    $avg_stmt->bind_param("i", $item_id);
-    $avg_stmt->execute();
-    $avg_stmt->close();
+    // First, check if there are any inventory entries
+    $check_stmt = $conn->prepare("SELECT COUNT(*) as entry_count FROM inventory_entries WHERE item_id = ?");
+    $check_stmt->bind_param("i", $item_id);
+    $check_stmt->execute();
+    $check_result = $check_stmt->get_result();
+    $check_row = $check_result->fetch_assoc();
+    $check_stmt->close();
+    
+    if ($check_row['entry_count'] == 0) {
+        // No entries exist, clear calculated values
+        $clear_stmt = $conn->prepare("UPDATE items SET calculated_unit_cost = NULL, calculated_quantity = NULL, average_unit_cost = NULL WHERE item_id = ?");
+        $clear_stmt->bind_param("i", $item_id);
+        $clear_stmt->execute();
+        $clear_stmt->close();
+    } else {
+        // Calculate and store both average cost and total quantity
+        $avg_stmt = $conn->prepare("
+            UPDATE items i 
+            SET 
+                average_unit_cost = (
+                    CASE 
+                        WHEN (i.initial_quantity > 0 AND (SELECT COUNT(*) FROM inventory_entries ie WHERE ie.item_id = i.item_id) > 0)
+                        THEN ((i.initial_quantity * i.unit_cost) + COALESCE((SELECT SUM(ie.quantity * ie.unit_cost) FROM inventory_entries ie WHERE ie.item_id = i.item_id), 0)) / (i.initial_quantity + COALESCE((SELECT SUM(ie.quantity) FROM inventory_entries ie WHERE ie.item_id = i.item_id), 0))
+                        ELSE i.unit_cost 
+                    END
+                ),
+                calculated_unit_cost = (
+                    CASE 
+                        WHEN (i.initial_quantity > 0 AND (SELECT COUNT(*) FROM inventory_entries ie WHERE ie.item_id = i.item_id) > 0)
+                        THEN ((i.initial_quantity * i.unit_cost) + COALESCE((SELECT SUM(ie.quantity * ie.unit_cost) FROM inventory_entries ie WHERE ie.item_id = i.item_id), 0)) / (i.initial_quantity + COALESCE((SELECT SUM(ie.quantity) FROM inventory_entries ie WHERE ie.item_id = i.item_id), 0))
+                        ELSE i.unit_cost 
+                    END
+                ),
+                calculated_quantity = (
+                    i.initial_quantity + COALESCE((SELECT SUM(ie.quantity) FROM inventory_entries ie WHERE ie.item_id = i.item_id), 0)
+                )
+            WHERE item_id = ?
+        ");
+        $avg_stmt->bind_param("i", $item_id);
+        $avg_stmt->execute();
+        $avg_stmt->close();
+    }
 }
 
 function logItemHistory($conn, $item_id, ?int $quantity_change = null, string $change_type = 'update', ?int $ris_id = null) {
