@@ -49,6 +49,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                             <a href="rspi.php" class="<?= $currentPage == 'rspi.php' ? 'active' : '' ?>">📦 RSPI</a>
                             <a href="PC.php" class="<?= $currentPage == 'PC.php' ? 'active' : '' ?>">🖥️ PC</a>
                             <a href="ics.php" class="<?= $currentPage == 'ics.php' ? 'active' : '' ?>">📦 ICS</a>
+                            <a href="ict_registry.php" class="<?= $currentPage == 'ict_registry.php' ? 'active' : '' ?>">📦 ICT</a>
+
                         </div>
                     </div>
 
