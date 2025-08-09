@@ -26,6 +26,7 @@ $history_stmt = $conn->prepare("
   FROM item_history ih
   LEFT JOIN ris r ON ih.ris_id = r.ris_id
   WHERE ih.item_id = ?
+    AND ih.change_type IN ('added', 'issued', 'entry')
   ORDER BY ih.changed_at DESC
 ");
 $history_stmt->bind_param("i", $item_id);

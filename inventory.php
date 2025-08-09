@@ -336,7 +336,7 @@ case 'update':
             
             if ($stmt->execute()) {
                 // Log history
-                logItemHistory($conn, $id, null, $change_type);
+                logItemHistory($conn, $new_id, $quantity_on_hand, 'update');
                 
                 // Get updated item data for response
                 $updated_stmt = $conn->prepare("SELECT * FROM items WHERE item_id = ?");

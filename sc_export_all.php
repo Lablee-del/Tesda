@@ -2,11 +2,17 @@
 require 'config.php';
 
 // Fetch all items
-$item_stmt = $conn->prepare("SELECT * FROM items ORDER BY stock_number ASC");
+$item_stmt = $conn->prepare("
+    SELECT i.*
+    FROM items i
+    INNER JOIN item_history ih ON i.item_id = ih.item_id
+    GROUP BY i.item_id
+    ORDER BY i.stock_number ASC
+");
 $item_stmt->execute();
 $items_result = $item_stmt->get_result();
 if (!$items_result || $items_result->num_rows === 0) {
-    die("❌ No items found in inventory.");
+    die("❌ No items found with history.");
 }
 
 // We'll store all stock cards here

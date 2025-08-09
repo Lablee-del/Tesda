@@ -45,6 +45,9 @@ INSERT INTO ics (ics_no, entity_name, fund_cluster, date_issued, received_by, re
 -- Note: You may need to add a 'category' column to your existing 'items' table to distinguish semi-expendable items
 ALTER TABLE items ADD COLUMN category VARCHAR(100) DEFAULT 'Consumable';
 UPDATE items SET category = 'Semi-Expendable' WHERE item_name LIKE '%computer%' OR item_name LIKE '%printer%' OR item_name LIKE '%chair%' OR item_name LIKE '%table%' OR item_name LIKE '%equipment%';
+    
+    
+    CREATE TABLE `ics` (
     ics_id INT(11) NOT NULL AUTO_INCREMENT,
     ics_no VARCHAR(50) NOT NULL,
     entity_name VARCHAR(255) NOT NULL,
