@@ -170,6 +170,7 @@ if ($is_editing) {
 }
 
 // Function to generate the next ICS number (only for new ICS)
+// Fixed version of the generateICSNumber function with error handling
 function generateICSNumber($conn) {
     $current_year = date('Y');
     $current_month = date('m');
@@ -178,12 +179,27 @@ function generateICSNumber($conn) {
     // Get the highest ICS number for current month/year
     $query = "SELECT ics_no FROM ics WHERE ics_no LIKE ? ORDER BY ics_no DESC LIMIT 1";
     $stmt = $conn->prepare($query);
+    
+    // Add error handling for prepare
+    if (!$stmt) {
+        // If prepare fails, log the error and return a basic format
+        error_log("MySQL prepare error in generateICSNumber: " . $conn->error);
+        return $prefix . '0001';
+    }
+    
     $search_pattern = $prefix . '%';
     $stmt->bind_param('s', $search_pattern);
-    $stmt->execute();
+    
+    if (!$stmt->execute()) {
+        // If execute fails, close statement and return basic format
+        error_log("MySQL execute error in generateICSNumber: " . $stmt->error);
+        $stmt->close();
+        return $prefix . '0001';
+    }
+    
     $result = $stmt->get_result();
     
-    if ($result->num_rows > 0) {
+    if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $last_ics = $row['ics_no'];
         
@@ -195,14 +211,47 @@ function generateICSNumber($conn) {
         $next_increment = 1;
     }
     
+    $stmt->close();
+    
     // Format the increment with leading zeros (4 digits)
     $formatted_increment = str_pad($next_increment, 4, '0', STR_PAD_LEFT);
     
     return $prefix . $formatted_increment;
 }
 
-// Generate the ICS number only for new ICS
-$auto_ics_number = $is_editing ? $ics_data['ics_no'] : generateICSNumber($conn);
+// Alternative simpler version if you're still having issues
+function generateICSNumberSimple($conn) {
+    $current_year = date('Y');
+    $current_month = date('m');
+    $prefix = 'ICS-' . $current_year . '/' . $current_month . '/';
+    
+    // Use a simpler query without LIKE
+    $query = "SELECT COUNT(*) as count FROM ics WHERE YEAR(date_issued) = ? AND MONTH(date_issued) = ?";
+    $stmt = $conn->prepare($query);
+    
+    if (!$stmt) {
+        error_log("MySQL prepare error: " . $conn->error);
+        return $prefix . '0001';
+    }
+    
+    $stmt->bind_param('ii', $current_year, $current_month);
+    
+    if (!$stmt->execute()) {
+        error_log("MySQL execute error: " . $stmt->error);
+        $stmt->close();
+        return $prefix . '0001';
+    }
+    
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $count = $row['count'];
+    $stmt->close();
+    
+    $next_increment = $count + 1;
+    $formatted_increment = str_pad($next_increment, 4, '0', STR_PAD_LEFT);
+    
+    return $prefix . $formatted_increment;
+}
 ?>
 
 <!DOCTYPE html>

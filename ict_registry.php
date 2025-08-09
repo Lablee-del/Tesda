@@ -131,13 +131,11 @@ $recap_result = $conn->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ICT Registry - Registry of Semi-Expendable Property Issued</title>
     <link rel="stylesheet" href="css/styles.css?v=<?= time() ?>">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .export-section {
-            margin-bottom: 20px;
             padding: 15px;
-            background-color: #f8f9fa;
             border-radius: 5px;
-            border: 1px solid #dee2e6;
         }
         
         .export-btn {
@@ -293,7 +291,7 @@ $recap_result = $conn->query("
         <!-- Export Section -->
         <div class="export-section">
             <button onclick="openAddModal()" class="export-btn">
-                ➕ Add New Entry
+                <i class="fas fa-plus"></i> Add New Item
             </button>
             <a href="ict_export.php" class="export-btn" target="_blank">
                 📄 Export to PDF

@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PC - Property Card</title>
     <link rel="stylesheet" href="css/styles.css?v=<?= time() ?>">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .export-section {
-            margin-bottom: 20px;
             padding: 15px;
-            background-color: #f8f9fa;
             border-radius: 5px;
-            border: 1px solid #dee2e6;
         }
         
         .export-btn {
@@ -103,9 +101,8 @@
 
         <!-- Export and Action Section -->
         <div class="export-section">
-            <h4>Actions</h4>
             <a href="add_pc.php" class="add-btn">
-                ➕ Add New Property Card Entry
+                <i class="fas fa-plus"></i> Add New Item
             </a>
             <a href="pc_export.php" class="export-btn" target="_blank">
                 📄 Export to PDF
