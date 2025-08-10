@@ -47,7 +47,6 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         </button>
                         <div class="dropdown-menu">
                             <a href="rspi.php" class="<?= $currentPage == 'rspi.php' ? 'active' : '' ?>">📦 RSPI</a>
-                            <a href="PC.php" class="<?= $currentPage == 'PC.php' ? 'active' : '' ?>">🖥️ PC</a>
                             <a href="ics.php" class="<?= $currentPage == 'ics.php' ? 'active' : '' ?>">📦 ICS</a>
                             <a href="ict_registry.php" class="<?= $currentPage == 'ict_registry.php' ? 'active' : '' ?>">📦 ICT</a>
 
@@ -60,7 +59,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                             🛠️ PPE
                         </button>
                         <div class="dropdown-menu">
-                            <a href="ppe_item1.php" class="<?= $currentPage == 'ppe_item1.php' ? 'active' : '' ?>">📌 Placeholder 1</a>
+                            <a href="PC.php" class="<?= $currentPage == 'PC.php' ? 'active' : '' ?>">PC</a>
                             <a href="ppe_item2.php" class="<?= $currentPage == 'ppe_item2.php' ? 'active' : '' ?>">📌 Placeholder 2</a>
                         </div>
                     </div>
