@@ -1,6 +1,7 @@
 <?php
 // edit_semi_expendable.php - Edit form for semi-expendable property
 require_once 'config.php';
+require_once 'sidebar.php'; // Add sidebar requirement
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $item = null;
@@ -13,14 +14,21 @@ $valid_categories = ['Other PPE', 'Office Equipment', 'ICT Equipment', 'Communic
 // Fetch item details
 if ($id > 0) {
     try {
-        $stmt = $pdo->prepare("SELECT * FROM semi_expendable_property WHERE id = ?");
-        $stmt->execute([$id]);
-        $item = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $conn->prepare("SELECT * FROM semi_expendable_property WHERE id = ?");
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $item = $result->fetch_assoc();
+        $stmt->close();
         
         if (!$item) {
             $error = "Item not found.";
         }
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
         $error = "Database error: " . $e->getMessage();
     }
 }
@@ -28,7 +36,7 @@ if ($id > 0) {
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $item) {
     try {
-        $stmt = $pdo->prepare("
+        $stmt = $conn->prepare("
             UPDATE semi_expendable_property 
             SET date = ?, 
                 ics_rrsp_no = ?, 
@@ -50,7 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $item) {
             WHERE id = ?
         ");
         
-        $result = $stmt->execute([
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        
+        $stmt->bind_param(
+            "ssssiississdssi",
             $_POST['date'],
             $_POST['ics_rrsp_no'],
             $_POST['semi_expendable_property_no'],
@@ -68,18 +81,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $item) {
             $_POST['category'],
             $_POST['remarks'],
             $id
-        ]);
+        );
         
-        if ($result) {
+        if ($stmt->execute()) {
             $success = "Item updated successfully!";
+            $stmt->close();
+            
             // Refresh item data
-            $stmt = $pdo->prepare("SELECT * FROM semi_expendable_property WHERE id = ?");
-            $stmt->execute([$id]);
-            $item = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt = $conn->prepare("SELECT * FROM semi_expendable_property WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $item = $result->fetch_assoc();
+            $stmt->close();
         } else {
-            $error = "Failed to update item.";
+            $error = "Failed to update item: " . $stmt->error;
+            $stmt->close();
         }
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
         $error = "Database error: " . $e->getMessage();
     }
 }

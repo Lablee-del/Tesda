@@ -52,7 +52,6 @@ try {
     $items = [];
     $error = "Database error: " . $e->getMessage();
 }
-?>
 
 // Calculate totals
 $total_items = count($items);
@@ -119,14 +118,117 @@ $total_quantity = array_sum(array_column($items, 'quantity_balance'));
             color: white;
             font-weight: 600;
         }
-        .search-container {
+        .search-add-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+            gap: 20px;
+        }
+        .search-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .search-input {
             width: 300px;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .btn-info {
+            background: #0ea5e9;
+            color: white;
+        }
+        .btn-info:hover {
+            background: #0284c7;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .detail-row {
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
         }
     </style>
 </head>
@@ -147,9 +249,9 @@ $total_quantity = array_sum(array_column($items, 'quantity_balance'));
             <?php endforeach; ?>
         </div>
 
-        <!-- Search -->
-        <div class="search-container">
-            <form method="GET">
+        <!-- Search and Add Container -->
+        <div class="search-add-container">
+            <form method="GET" class="search-form">
                 <input type="hidden" name="category" value="<?php echo htmlspecialchars($category); ?>">
                 <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" 
                        placeholder="Search by description, property number, or officer..." 
@@ -163,6 +265,11 @@ $total_quantity = array_sum(array_column($items, 'quantity_balance'));
                     </a>
                 <?php endif; ?>
             </form>
+            
+            <!-- Add New Item Button -->
+            <a href="add_semi_expendable.php?category=<?php echo urlencode($category); ?>" class="btn btn-success">
+                <i class="fas fa-plus"></i> Add New Item
+            </a>
         </div>
 
         <!-- Statistics Cards -->
@@ -213,9 +320,15 @@ $total_quantity = array_sum(array_column($items, 'quantity_balance'));
                         <tr>
                             <td colspan="10" style="text-align: center; padding: 40px;">
                                 <?php if (!empty($search)): ?>
-                                    No items found matching your search criteria.
+                                    <p>No items found matching your search criteria.</p>
+                                    <a href="add_semi_expendable.php?category=<?php echo urlencode($category); ?>" class="btn btn-success">
+                                        <i class="fas fa-plus"></i> Add First Item
+                                    </a>
                                 <?php else: ?>
-                                    No items found in this category.
+                                    <p>No items found in this category.</p>
+                                    <a href="add_semi_expendable.php?category=<?php echo urlencode($category); ?>" class="btn btn-success">
+                                        <i class="fas fa-plus"></i> Add First Item
+                                    </a>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -239,9 +352,9 @@ $total_quantity = array_sum(array_column($items, 'quantity_balance'));
                                     <button class="btn btn-sm btn-info" onclick="viewItem(<?php echo $item['id']; ?>)" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-primary" onclick="editItem(<?php echo $item['id']; ?>)" title="Edit">
+                                    <a href="edit_semi_expendable.php?id=<?php echo $item['id']; ?>" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="fas fa-edit"></i>
-                                    </button>
+                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -321,11 +434,6 @@ $total_quantity = array_sum(array_column($items, 'quantity_balance'));
                 console.error('Error:', error);
                 alert('Error loading item details');
             });
-    }
-
-    function editItem(id) {
-        // Redirect to edit page or open edit modal
-        window.location.href = `edit_semi_expendable.php?id=${id}`;
     }
 
     function closeModal(modalId) {

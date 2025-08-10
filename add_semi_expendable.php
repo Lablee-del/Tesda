@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'sidebar.php'; // Add sidebar requirement
 
 $error = '';
 $success = '';
@@ -10,7 +11,7 @@ $valid_categories = ['Other PPE', 'Office Equipment', 'ICT Equipment', 'Communic
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        $stmt = $pdo->prepare("
+        $stmt = $conn->prepare("
             INSERT INTO semi_expendable_property 
             (date, ics_rrsp_no, semi_expendable_property_no, item_description, estimated_useful_life, 
              quantity_issued, office_officer_issued, quantity_returned, office_officer_returned, 
@@ -19,7 +20,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
-        $result = $stmt->execute([
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        
+        $stmt->bind_param(
+            "ssssiississdssss",
             $_POST['date'],
             $_POST['ics_rrsp_no'],
             $_POST['semi_expendable_property_no'],
@@ -37,16 +43,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['category'],
             $_POST['fund_cluster'] ?: '101',
             $_POST['remarks']
-        ]);
+        );
         
-        if ($result) {
+        if ($stmt->execute()) {
             $success = "Item added successfully!";
+            $stmt->close();
             // Clear form data
             $_POST = [];
         } else {
-            $error = "Failed to add item.";
+            $error = "Failed to add item: " . $stmt->error;
+            $stmt->close();
         }
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
         $error = "Database error: " . $e->getMessage();
     }
 }
