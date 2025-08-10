@@ -26,7 +26,7 @@ $history_stmt = $conn->prepare("
   FROM item_history ih
   LEFT JOIN ris r ON ih.ris_id = r.ris_id
   WHERE ih.item_id = ?
-    AND ih.change_type IN ('added', 'issued', 'entry')
+    AND ih.change_type IN ('add', 'issued', 'entry')
   ORDER BY ih.changed_at DESC
 ");
 $history_stmt->bind_param("i", $item_id);
@@ -280,7 +280,7 @@ $ris = ['entity_name' => 'TESDA'];
             $date = date('M d, Y', strtotime($h['changed_at']));
 
             // temporary (fix this shit)
-            $ris_no = !empty($h['ris_no']) ? htmlspecialchars($h['ris_no']) : '';
+            $reference = !empty($h['ris_no']) ? htmlspecialchars($h['ris_no']) : htmlspecialchars($items['iar']);
 
             $receipt_qty = $h['quantity_change'] > 0 ? htmlspecialchars($h['quantity_change']) : '';
             $issue_qty = $h['quantity_change'] < 0 ? abs(htmlspecialchars($h['quantity_change'])) : '';
@@ -292,7 +292,7 @@ $ris = ['entity_name' => 'TESDA'];
               <td><?php echo $date; ?></td>
 
               <!-- Temporary (ris_no) -->
-              <td><?php echo $ris_no; ?></td>
+              <td><?php echo $reference; ?></td>
 
               <td><?php echo $receipt_qty; ?></td>
               <td><?php echo $issue_qty; ?></td>

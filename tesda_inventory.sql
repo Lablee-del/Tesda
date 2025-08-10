@@ -960,6 +960,12 @@ LEFT JOIN ris r ON ih.ris_id = r.ris_id
 WHERE ih.item_id = 1
 ORDER BY ih.changed_at DESC;
 
+ALTER Table items
+ADD COLUMN `I.A.R` VARCHAR(20) DEFAULT NULL;
+
+ALTER TABLE items
+CHANGE `I.A.R` iar VARCHAR(20) DEFAULT NULL;
+
 
   
 main

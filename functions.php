@@ -127,36 +127,4 @@ function logItemHistory($conn, $item_id, ?int $quantity_change = null, string $c
     $insert->close();
 }
 
-function updateLastHistoryEntry($conn, $item_id, $change_type, $quantity = null) {
-    // Get latest history entry for this item
-    $stmt = $conn->prepare("
-        SELECT history_id 
-        FROM item_history 
-        WHERE item_id = ? 
-        ORDER BY changed_at DESC 
-        LIMIT 1
-    ");
-    $stmt->bind_param("i", $item_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $last = $result->fetch_assoc();
-    $stmt->close();
-
-    if ($last) {
-        // Update that entry
-        $stmt = $conn->prepare("
-            UPDATE item_history 
-            SET change_type = ?, quantity = ?, changed_at = NOW()
-            WHERE history_id = ?
-        ");
-        $stmt->bind_param("sii", $change_type, $quantity, $last['history_id']);
-        $stmt->execute();
-        $stmt->close();
-        return true;
-    } else {
-        // If no entry exists, fall back to inserting
-        logItemHistory($conn, $item_id, $quantity, $change_type);
-        return false;
-    }
-}
 ?>

@@ -248,7 +248,7 @@ body {
                     <?php foreach ($history_rows as $h): ?>
                         <tr>
                             <td><?= date('M d, Y', strtotime($h['changed_at'])); ?></td>
-                            <td><?= !empty($h['ris_no']) ? htmlspecialchars($h['ris_no']) : ''; ?></td>
+                            <td><?= !empty($h['ris_no']) ? htmlspecialchars($h['ris_no']) : htmlspecialchars($item['iar']); ?></td>
                             <td><?= $h['quantity_change'] > 0 ? htmlspecialchars($h['quantity_change']) : ''; ?></td>
                             <td><?= $h['quantity_change'] < 0 ? abs(htmlspecialchars($h['quantity_change'])) : ''; ?></td>
                             <td></td>

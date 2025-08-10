@@ -27,6 +27,7 @@
         <thead>
             <tr>
                 <th><i class=""></i> Stock No.</th>
+                <th><i class=""></i> I.A.R</th>
                 <th><i class=""></i> Item</th>
                 <th><i class=""></i> Description</th>
                 <th><i class=""></i> Unit of Measurement</th>
@@ -66,6 +67,7 @@
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr data-id='{$row['item_id']}'>
                             <td><strong>{$row['stock_number']}</strong></td>
+                            <td>{$row['iar']}</td>
                             <td>{$row['item_name']}</td>
                             <td>{$row['description']}</td>
                             <td>{$row['unit']}</td>
