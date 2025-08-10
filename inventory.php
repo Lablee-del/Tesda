@@ -58,6 +58,7 @@ if (isset($_GET['action'])) {
                 $reorder_point = intval($_POST['reorder_point']);
                 $unit_cost = floatval($_POST['unit_cost']);
                 $quantity_on_hand = intval($_POST['quantity_on_hand']);
+                $iar = $_POST['iar'];
                 
                 // Check if stock number already exists
                 $check_stmt = $conn->prepare("SELECT item_id FROM items WHERE stock_number = ?");
@@ -104,8 +105,11 @@ if (isset($_GET['action'])) {
                     $entry_stmt->close();
                 } else {
                     // Insert new item
-                    $stmt = $conn->prepare("INSERT INTO items (stock_number, item_name, description, unit, reorder_point, unit_cost, quantity_on_hand, initial_quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->bind_param("ssssiidi", $stock_number, $item_name, $description, $unit, $reorder_point, $unit_cost, $quantity_on_hand, $quantity_on_hand);
+                $stmt = $conn->prepare("
+                    INSERT INTO items (stock_number, item_name, description, iar, unit, reorder_point, unit_cost, quantity_on_hand, initial_quantity)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ");
+                $stmt->bind_param("sssssiidi", $stock_number, $item_name, $description, $iar, $unit, $reorder_point, $unit_cost, $quantity_on_hand, $quantity_on_hand);
                     
                     if ($stmt->execute()) {
                         $new_id = $conn->insert_id;
@@ -150,6 +154,7 @@ case 'update':
                 stock_number,
                 item_name,
                 description,
+                iar,
                 unit,
                 reorder_point,
                 unit_cost, 
@@ -181,6 +186,7 @@ case 'update':
             'stock_number' => 'string',
             'item_name' => 'string', 
             'description' => 'string',
+            'iar' => 'string',
             'unit' => 'string',
             'reorder_point' => 'int',
             'unit_cost' => 'float',
@@ -658,6 +664,9 @@ case 'update':
             <input type="text" name="stock_number" id="add_stock_number" placeholder="Enter stock number" required>
             <div id="stock_status" class="stock-status"></div>
 
+            <label for="add_iar">I.A.R</label>
+            <input type="text" name="iar" id="add_iar" placeholder="Enter I.A.R" required>
+
             <label for="add_item_name">Item Name</label>
             <input type="text" name="item_name" id="add_item_name" placeholder="Name" required readonly>
 
@@ -693,6 +702,9 @@ case 'update':
 
             <label for="edit_stock_number">Stock Number</label>
             <input type="text" name="stock_number" id="edit_stock_number" placeholder="e.g. 1001" required>
+
+            <label for="edit_iar">I.A.R</label>
+            <input type="text" name="iar" id="edit_iar" placeholder="Enter I.A.R" required>
 
             <label for="edit_item_name">Item Name</label>
             <input type="text" name="item_name" id="edit_item_name" placeholder="e.g Hammer" required>
