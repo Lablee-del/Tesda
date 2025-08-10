@@ -5,10 +5,46 @@ require 'functions.php';
 // DELETE LOGIC (moved from delete_ris.php)
 if (isset($_GET['delete_ris_id'])) {
     $ris_id = (int)$_GET['delete_ris_id'];
-    // Delete RIS items first due to foreign key constraint
-    $conn->query("DELETE FROM ris_items WHERE ris_id = $ris_id");
-    // Then delete RIS header
-    $conn->query("DELETE FROM ris WHERE ris_id = $ris_id");
+    
+    try {
+        // Start transaction for data integrity
+        $conn->autocommit(FALSE);
+        
+        // 1. Delete any related item_history entries first (if they reference ris_id)
+        $stmt = $conn->prepare("DELETE FROM item_history WHERE ris_id = ?");
+        $stmt->bind_param("i", $ris_id);
+        $stmt->execute();
+        $stmt->close();
+        
+        // 2. Delete RIS items first due to foreign key constraint
+        $stmt = $conn->prepare("DELETE FROM ris_items WHERE ris_id = ?");
+        $stmt->bind_param("i", $ris_id);
+        $stmt->execute();
+        $stmt->close();
+        
+        // 3. Delete RIS header
+        $stmt = $conn->prepare("DELETE FROM ris WHERE ris_id = ?");
+        $stmt->bind_param("i", $ris_id);
+        $stmt->execute();
+        $stmt->close();
+        
+        // Commit the transaction
+        $conn->commit();
+        $conn->autocommit(TRUE);
+        
+    } catch (Exception $e) {
+        // Rollback on error
+        $conn->rollback();
+        $conn->autocommit(TRUE);
+        
+        // You can add error handling here
+        error_log("Error deleting RIS: " . $e->getMessage());
+        
+        // Optionally redirect with error message
+        header("Location: ris.php?error=delete_failed");
+        exit();
+    }
+    
     // Redirect to avoid resubmission on refresh
     header("Location: ris.php");
     exit();

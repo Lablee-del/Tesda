@@ -336,8 +336,14 @@ case 'update':
             
             if ($stmt->execute()) {
                 // Log history
-                logItemHistory($conn, $new_id, $quantity_on_hand, 'update');
-                
+                // Get quantity change (if provided), else null
+                    $qty_change = isset($_POST['quantity_on_hand']) 
+                        ? intval($_POST['quantity_on_hand']) 
+                        : null;
+
+                    // Log history with correct item ID
+                    logItemHistory($conn, $id, $qty_change, 'update');
+
                 // Get updated item data for response
                 $updated_stmt = $conn->prepare("SELECT * FROM items WHERE item_id = ?");
                 $updated_stmt->bind_param("i", $id);
