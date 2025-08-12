@@ -23,9 +23,11 @@ if (isset($_GET['action'])) {
                             'description' => $row['description'],
                             'unit' => $row['unit'],
                             'reorder_point' => $row['reorder_point'],
-                            'unit_cost' => $row['unit_cost']
+                            'unit_cost' => $row['unit_cost'],
+                            'iar' => $row['iar']
                         ]
                     ]);
+
                 } else {
                     echo json_encode(['exists' => false]);
                 }
@@ -577,6 +579,7 @@ case 'update':
                                     data-unit='{$row['unit']}'
                                     data-reorder_point='{$row['reorder_point']}'
                                     data-unit_cost='" . (isset($row['calculated_unit_cost']) && $row['calculated_unit_cost'] !== null ? $row['calculated_unit_cost'] : ($row['has_multiple_entries'] ? $row['calculated_average_cost'] : $row['unit_cost'])) . "'                                    data-quantity_on_hand='{$row['quantity_on_hand']}'
+                                    data-iar='{$row['iar']}'
                                     title='Edit Item'
                                 >
                                     <i class='fas fa-edit'></i> Edit
@@ -665,7 +668,7 @@ case 'update':
             <div id="stock_status" class="stock-status"></div>
 
             <label for="add_iar">I.A.R</label>
-            <input type="text" name="iar" id="add_iar" placeholder="Enter I.A.R" required>
+            <input type="text" name="iar" id="add_iar" placeholder="Enter I.A.R" required readonly>
 
             <label for="add_item_name">Item Name</label>
             <input type="text" name="item_name" id="add_item_name" placeholder="Name" required readonly>

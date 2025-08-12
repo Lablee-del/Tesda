@@ -70,6 +70,8 @@ function checkStockNumber(stockNumber) {
             document.getElementById('add_unit').value = data.item.unit;
             document.getElementById('add_reorder_point').value = data.item.reorder_point;
             document.getElementById('add_unit_cost').value = data.item.unit_cost;
+            document.getElementById('add_iar').value = data.item.iar;
+            
             
             // Make only description, unit, and reorder_point readonly
             document.getElementById('add_item_name').readOnly = true;
@@ -77,6 +79,8 @@ function checkStockNumber(stockNumber) {
             document.getElementById('add_unit').readOnly = true;
             document.getElementById('add_reorder_point').readOnly = true;
             document.getElementById('add_unit_cost').readOnly = false; // Allow editing unit cost
+            document.getElementById('add_iar').readOnly = true;
+            
             
             // Keep quantity field editable but clear it
             document.getElementById('add_quantity_on_hand').value = '';
@@ -111,6 +115,8 @@ function clearAddForm() {
     document.getElementById('add_unit').readOnly = true;
     document.getElementById('add_reorder_point').readOnly = true;
     document.getElementById('add_unit_cost').readOnly = true; // This will be changed when stock exists
+    document.getElementById('add_iar').readOnly = true;
+
 }
 
 function enableAddFormFields() {
@@ -120,6 +126,8 @@ function enableAddFormFields() {
     document.getElementById('add_unit').readOnly = false;
     document.getElementById('add_reorder_point').readOnly = false;
     document.getElementById('add_unit_cost').readOnly = false; // Keep this enabled
+    document.getElementById('add_iar').readOnly = false;
+
     
     // Clear fields
     document.getElementById('add_item_name').value = '';
@@ -128,6 +136,8 @@ function enableAddFormFields() {
     document.getElementById('add_reorder_point').value = '';
     document.getElementById('add_unit_cost').value = '';
     document.getElementById('add_quantity_on_hand').value = '';
+    document.getElementById('add_iar').value = '';
+
 }
 
 function closeAddModal() {
@@ -194,7 +204,8 @@ document.getElementById('editForm').addEventListener('submit', function(e) {
         unit: document.getElementById('edit_unit').value.trim(),
         reorder_point: parseInt(document.getElementById('edit_reorder_point').value),
         unit_cost: parseFloat(document.getElementById('edit_unit_cost').value),
-        quantity_on_hand: parseInt(document.getElementById('edit_quantity_on_hand').value)
+        quantity_on_hand: parseInt(document.getElementById('edit_quantity_on_hand').value),
+        iar: document.getElementById('edit_iar').value.trim()
     };
     
     // Get original values (stored when modal was opened)
@@ -205,7 +216,9 @@ document.getElementById('editForm').addEventListener('submit', function(e) {
         unit: document.getElementById('edit_unit').dataset.originalValue || '',
         reorder_point: parseInt(document.getElementById('edit_reorder_point').dataset.originalValue || '0'),
         unit_cost: parseFloat(document.getElementById('edit_unit_cost').dataset.originalValue || '0'),
-        quantity_on_hand: parseInt(document.getElementById('edit_quantity_on_hand').dataset.originalValue || '0')
+        quantity_on_hand: parseInt(document.getElementById('edit_quantity_on_hand').dataset.originalValue || '0'),
+        iar: document.getElementById('edit_iar').dataset.originalValue || ''
+
     };
     
     // Identify which fields have changed
@@ -331,6 +344,7 @@ function openEditModal(button) {
     document.getElementById('edit_reorder_point').value = button.dataset.reorder_point;
     document.getElementById('edit_unit_cost').value = parseFloat(button.dataset.unit_cost).toFixed(2);
     document.getElementById('edit_quantity_on_hand').value = button.dataset.quantity_on_hand;
+    document.getElementById('edit_iar').value = button.dataset.iar;
     
     // Store original values in data attributes for change detection
     document.getElementById('edit_stock_number').dataset.originalValue = button.dataset.stock_number;
@@ -340,6 +354,7 @@ function openEditModal(button) {
     document.getElementById('edit_reorder_point').dataset.originalValue = button.dataset.reorder_point;
     document.getElementById('edit_unit_cost').dataset.originalValue = parseFloat(button.dataset.unit_cost).toFixed(2);
     document.getElementById('edit_quantity_on_hand').dataset.originalValue = button.dataset.quantity_on_hand;
+    document.getElementById('edit_iar').dataset.originalValue = button.dataset.iar;
     
     // Check if item has multiple entries
     checkMultipleEntries(itemId);

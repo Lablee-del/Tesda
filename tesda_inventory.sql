@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 10, 2025 at 07:42 PM
+-- Generation Time: Aug 12, 2025 at 06:05 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -41,9 +41,9 @@ CREATE TABLE `inventory_entries` (
 --
 
 INSERT INTO `inventory_entries` (`entry_id`, `item_id`, `quantity`, `unit_cost`, `created_at`, `is_active`) VALUES
-(264, 199, 11, 11.00, '2025-08-10 17:40:23', 1),
-(265, 199, -5, 0.00, '2025-08-10 17:40:56', 1),
-(266, 199, 13, 5.00, '2025-08-10 17:41:28', 1);
+(285, 210, 1, 30.00, '2025-08-12 15:31:34', 1),
+(286, 210, -5, 0.00, '2025-08-12 15:32:01', 1),
+(287, 210, 5, 21.00, '2025-08-12 15:32:49', 1);
 
 -- --------------------------------------------------------
 
@@ -160,7 +160,8 @@ INSERT INTO `items` (`item_id`, `stock_number`, `item_name`, `description`, `uni
 (85, 'T.05.b', 'TISSUE FACIAL', 'Econo Box, 2ply, 200-250pulls', 'box', NULL, NULL, 0, 0.0000, 0, 0.0000, NULL, NULL, NULL),
 (86, 'T.05.c', 'TOILET TISSUE PAPER', '2ply, 12\'s per pack, 1000 sheets per roll', 'pack', NULL, NULL, 0, 0.0000, 0, 0.0000, NULL, NULL, NULL),
 (87, 'U.01.a', 'USB', 'Flash Drive, 64GB', 'pc', NULL, NULL, 0, 0.0000, 0, 0.0000, NULL, NULL, NULL),
-(199, '123', '123', '123', '123', 123, NULL, 29, 10.0000, 10, 8.4118, 8.4118, 29, '123');
+(210, '123', '123', '123', '123', 1, NULL, 5, 21.0000, 4, 23.2500, 23.2500, 5, '1232'),
+(211, 'qweqw', 'qwewqe', 'qweqwe', 'qweqwe', 1, NULL, 10, 10.0000, 10, NULL, NULL, NULL, 'qwe');
 
 -- --------------------------------------------------------
 
@@ -206,10 +207,17 @@ INSERT INTO `item_history` (`history_id`, `item_id`, `stock_number`, `item_name`
 (471, 1, 'A.01.a', 'ARCHFILE FOLDER', 'Tagila Lock', 'pc', 11, 11.09, 22, 0, 'no_change', '2025-08-07 00:06:33', 'cleared', NULL),
 (472, 1, 'A.01.a', 'ARCHFILE FOLDER', 'Tagila Lock', 'pc', 11, 10.00, 10, -12, 'decrease', '2025-08-07 00:06:45', 'selective_update', NULL),
 (490, 1, 'A.01.a', 'ARCHFILE FOLDER', 'Tagila Lock', 'pc', 11, 11.00, 11, 1, 'increase', '2025-08-07 00:38:56', 'selective_update', NULL),
-(543, 199, '123', '123', '123', '123', 123, 10.00, 10, 10, 'increase', '2025-08-11 01:39:58', 'add', NULL),
-(544, 199, '123', '123', '123', '123', 123, 10.00, 21, 11, 'increase', '2025-08-11 01:40:23', 'entry', NULL),
-(545, 199, '123', '123', '123', '123', 123, 10.00, 16, -5, 'decrease', '2025-08-11 01:40:56', 'issued', 23),
-(546, 199, '123', '123', '123', '123', 123, 10.00, 29, 13, 'increase', '2025-08-11 01:41:28', 'entry', NULL);
+(577, 210, '123', '123', '123', '123', 1, 21.00, 4, 4, 'increase', '2025-08-12 23:31:11', 'add', NULL),
+(578, 210, '123', '123', '123', '123', 1, 25.50, 5, 1, 'increase', '2025-08-12 23:31:34', 'entry', NULL),
+(579, 210, '123', '123', '123', '123', 1, 25.50, 0, -5, 'decrease', '2025-08-12 23:32:01', 'issued', 29),
+(580, 210, '123', '123', '123', '123', 1, 23.25, 5, 5, 'increase', '2025-08-12 23:32:49', 'entry', NULL),
+(581, 211, 'qwe', 'qwe', 'qwe', 'qwe', 1, 12.00, 12, 12, 'increase', '2025-08-12 23:33:33', 'add', NULL),
+(582, 211, 'qwe', 'qwe', 'qwe', 'qwe', 1, 12.50, 17, 5, 'increase', '2025-08-12 23:34:02', 'entry', NULL),
+(583, 211, 'qwe', 'qwe', 'qwe', 'qwe', 1, 12.50, 17, 0, 'no_change', '2025-08-12 23:34:15', 'cleared', NULL),
+(584, 211, 'qwe', 'qwe', 'qwe', 'qwe', 1, 10.00, 10, 10, 'increase', '2025-08-12 23:34:29', 'update', NULL),
+(585, 211, 'qwe', 'qwe', 'qwe', 'qwe', 1, 16.00, 12, 2, 'increase', '2025-08-12 23:34:44', 'entry', NULL),
+(587, 211, 'qweqw', 'qwewqe', 'qweqwe', 'qweqwe', 1, 10.00, 10, 10, 'increase', '2025-08-12 23:37:04', 'update', NULL),
+(588, 210, '123', '123', '123', '123', 1, 23.25, 5, 0, 'no_change', '2025-08-13 00:01:35', 'update', NULL);
 
 -- --------------------------------------------------------
 
@@ -305,7 +313,7 @@ CREATE TABLE `ris` (
 --
 
 INSERT INTO `ris` (`ris_id`, `entity_name`, `fund_cluster`, `division`, `office`, `responsibility_center_code`, `ris_no`, `date_requested`, `purpose`, `requested_by`, `approved_by`, `issued_by`, `received_by`, `created_at`) VALUES
-(23, 'qwe', 'qwe', 'ORD', 'TESDA CAR', 'qwe', '2025/08/0001', '2025-08-11', '123', '123', '123', '123', '123', '2025-08-10 17:40:56');
+(29, '123', '123', 'FASD', 'TESDA CAR', '123', '2025/08/0001', '2025-08-12', '123', '123', '123', '123', '123', '2025-08-12 15:32:01');
 
 -- --------------------------------------------------------
 
@@ -328,7 +336,7 @@ CREATE TABLE `ris_items` (
 --
 
 INSERT INTO `ris_items` (`item_id`, `ris_id`, `stock_number`, `stock_available`, `issued_quantity`, `remarks`, `unit_cost_at_issue`) VALUES
-(0, 23, '123', 'Yes', 5, '123', 10.52);
+(0, 29, '123', 'Yes', 5, '213', 25.50);
 
 -- --------------------------------------------------------
 
@@ -468,19 +476,19 @@ ALTER TABLE `ris`
 -- AUTO_INCREMENT for table `inventory_entries`
 --
 ALTER TABLE `inventory_entries`
-  MODIFY `entry_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=267;
+  MODIFY `entry_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=291;
 
 --
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=200;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=212;
 
 --
 -- AUTO_INCREMENT for table `item_history`
 --
 ALTER TABLE `item_history`
-  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=547;
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=589;
 
 --
 -- AUTO_INCREMENT for table `item_history_archive`
@@ -498,7 +506,7 @@ ALTER TABLE `property_cards`
 -- AUTO_INCREMENT for table `ris`
 --
 ALTER TABLE `ris`
-  MODIFY `ris_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `ris_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- Constraints for dumped tables

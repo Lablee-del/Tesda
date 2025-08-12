@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Only insert if there's an issued quantity or remarks
         if ($issued_qty > 0 || !empty($remark)) {
-            // GET THE CURRENT UNIT COST BEFORE ANY CHANGES - ADD THIS
+            // GET THE CURRENT AVERAGE UNIT COST BEFORE ANY CHANGES
             $stmt = $conn->prepare("SELECT average_unit_cost FROM items WHERE stock_number = ?");
             $stmt->bind_param("s", $stock_no);
             $stmt->execute();
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $current_unit_cost = $result->fetch_assoc()['average_unit_cost'];
             $stmt->close();
 
-            // MODIFY THE INSERT STATEMENT TO INCLUDE UNIT COST
+            // INSERT INTO RIS_ITEMS WITH UNIT COST AT TIME OF ISSUE
             $stmt = $conn->prepare("INSERT INTO ris_items (ris_id, stock_number, stock_available, issued_quantity, remarks, unit_cost_at_issue)
                                 VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ississ", $ris_id, $stock_no, $stock_available, $issued_qty, $remark, $current_unit_cost);
@@ -107,13 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Update inventory: deduct issued quantity
             if ($issued_qty > 0) {
-                // Deduct from main quantity
-                $stmt = $conn->prepare("UPDATE items SET quantity_on_hand = quantity_on_hand - ? WHERE stock_number = ?");
-                $stmt->bind_param("is", $issued_qty, $stock_no);
-                $stmt->execute();
-                $stmt->close();
-
-                // Get item_id
+                // Get item_id first
                 $stmt = $conn->prepare("SELECT item_id FROM items WHERE stock_number = ?");
                 $stmt->bind_param("s", $stock_no);
                 $stmt->execute();
@@ -122,26 +116,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $item_id = $item['item_id'];
                 $stmt->close();
 
-                // Insert a NEGATIVE entry but with ZERO cost (doesn't affect average)
+                // Deduct from main quantity_on_hand
+                $stmt = $conn->prepare("UPDATE items SET quantity_on_hand = quantity_on_hand - ? WHERE stock_number = ?");
+                $stmt->bind_param("is", $issued_qty, $stock_no);
+                $stmt->execute();
+                $stmt->close();
+
+                // Insert a NEGATIVE entry with ZERO cost (doesn't affect arithmetic mean)
                 $negative_qty = -$issued_qty;
                 $zero_cost = 0.00;
                 $stmt = $conn->prepare("INSERT INTO inventory_entries (item_id, quantity, unit_cost, created_at) VALUES (?, ?, ?, NOW())");
                 $stmt->bind_param("iid", $item_id, $negative_qty, $zero_cost);
                 $stmt->execute();
                 $stmt->close();
+                
+                // Log the history
                 logItemHistory($conn, $item_id, -$issued_qty, 'issued', $ris_id);
-            }
 
-            // Recalculate average cost
-            $stmt = $conn->prepare("SELECT item_id FROM items WHERE stock_number = ?");
-            $stmt->bind_param("s", $stock_no);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if ($row = $result->fetch_assoc()) {
-                $item_id = $row['item_id'];
+                // Recalculate average cost using arithmetic mean
                 updateAverageCost($conn, $item_id);
             }
-            $stmt->close();
         }
     }
 

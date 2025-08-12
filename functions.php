@@ -1,46 +1,70 @@
 <?php 
 
 function updateAverageCost($conn, $item_id) {
-    // Get totals for positive qty (for average) and all qty (for current stock)
+    // Get item info and entries
     $sql = "
         SELECT 
-            (i.initial_quantity * i.unit_cost) 
-                + COALESCE(SUM(CASE WHEN ie.quantity > 0 THEN ie.quantity * ie.unit_cost ELSE 0 END), 0) AS total_cost_for_avg,
-            (i.initial_quantity) 
-                + COALESCE(SUM(CASE WHEN ie.quantity > 0 THEN ie.quantity ELSE 0 END), 0) AS total_qty_for_avg,
-            (i.initial_quantity) 
-                + COALESCE(SUM(ie.quantity), 0) AS total_qty_all
+            i.unit_cost,
+            i.initial_quantity,
+            i.average_unit_cost,
+            i.calculated_quantity,
+            i.calculated_unit_cost
         FROM items i
-        LEFT JOIN inventory_entries ie ON i.item_id = ie.item_id
         WHERE i.item_id = ?
-        GROUP BY i.item_id
     ";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $item_id);
     $stmt->execute();
-    $result = $stmt->get_result();
-    $data = $result->fetch_assoc();
+    $item = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 
-    if (!$data || $data['total_qty_all'] <= 0) {
-        // No stock left — reset average
-        $reset = $conn->prepare("
-            UPDATE items 
-            SET calculated_unit_cost = NULL, calculated_quantity = NULL, average_unit_cost = NULL
-            WHERE item_id = ?
-        ");
-        $reset->bind_param("i", $item_id);
-        $reset->execute();
-        $reset->close();
-        return;
+    if (!$item) return;
+
+    // Get last added positive entry's cost
+    $last_entry_stmt = $conn->prepare("
+        SELECT unit_cost 
+        FROM inventory_entries 
+        WHERE item_id = ? AND quantity > 0 
+        ORDER BY created_at DESC LIMIT 1
+    ");
+    $last_entry_stmt->bind_param("i", $item_id);
+    $last_entry_stmt->execute();
+    $last_entry = $last_entry_stmt->get_result()->fetch_assoc();
+    $last_entry_stmt->close();
+
+    // If no entries, just set the average = unit cost
+    if (!$last_entry && $item['initial_quantity'] > 0) {
+        $avg_cost = $item['unit_cost'];
+        $qty = $item['initial_quantity'];
+    } else {
+        // Determine the base cost for averaging
+        if ($item['calculated_quantity'] == 0 && $item['average_unit_cost'] !== null) {
+            // Stock was issued completely, start from preserved average
+            $base_cost = $item['average_unit_cost'];
+        } elseif ($item['initial_quantity'] > 0) {
+            // First addition after initial stock
+            $base_cost = $item['unit_cost'];
+        } else {
+            // If no initial quantity but we have an average stored
+            $base_cost = $item['average_unit_cost'] ?? $item['unit_cost'];
+        }
+
+        $new_cost = $last_entry['unit_cost'] ?? $base_cost;
+
+        // Arithmetic mean with preserved base cost + new entry cost
+        $avg_cost = ($base_cost + $new_cost) / 2;
+
+        // Get updated quantity
+        $qty_stmt = $conn->prepare("SELECT SUM(quantity) as total_qty FROM inventory_entries WHERE item_id = ?");
+        $qty_stmt->bind_param("i", $item_id);
+        $qty_stmt->execute();
+        $total_qty = $qty_stmt->get_result()->fetch_assoc()['total_qty'] ?? 0;
+        $qty_stmt->close();
+
+        $qty = max(0, $item['initial_quantity'] + $total_qty);
     }
 
-    // Weighted average cost uses only positive qty
-    $avg_cost = ($data['total_qty_for_avg'] > 0) 
-        ? $data['total_cost_for_avg'] / $data['total_qty_for_avg'] 
-        : 0;
-
-    // Update items table — store full precision average, real current qty
+    // Save new values
     $update = $conn->prepare("
         UPDATE items
         SET 
@@ -49,11 +73,10 @@ function updateAverageCost($conn, $item_id) {
             calculated_quantity = ?
         WHERE item_id = ?
     ");
-    $update->bind_param("ddii", $avg_cost, $avg_cost, $data['total_qty_all'], $item_id);
+    $update->bind_param("ddii", $avg_cost, $avg_cost, $qty, $item_id);
     $update->execute();
     $update->close();
 }
-
 
 
 function logItemHistory($conn, $item_id, ?int $quantity_change = null, string $change_type = 'update', ?int $ris_id = null) {
@@ -114,10 +137,9 @@ function logItemHistory($conn, $item_id, ?int $quantity_change = null, string $c
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
-    // Use item['unit_cost'] or maybe average_unit_cost depending on semantics
-    $unit_cost = $item['unit_cost'];
+    // Use average_unit_cost for history records instead of unit_cost
+    $unit_cost = $item['average_unit_cost'] ?? $item['unit_cost'];
 
-    // ris_id may be null; bind_param requires a value, so coalesce to null
     $insert->bind_param(
         "issssidiissi",
         $item_id,
